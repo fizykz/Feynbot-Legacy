@@ -1,4 +1,10 @@
+import json 
+import numpy as np 
+
 import discord
+
+import utils
+
 
 class MyClient(discord.Client):
     async def on_ready(self):
@@ -13,4 +19,5 @@ class MyClient(discord.Client):
             await message.channel.send('pong')
 
 client = MyClient()
-client.run('token')
+client.run('token')	
+
