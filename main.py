@@ -5,6 +5,8 @@ import discord
 
 import utils
 
+properties = utils.fileToJson("./properties.json")
+
 
 class MyClient(discord.Client):
     async def on_ready(self):
