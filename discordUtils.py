@@ -7,6 +7,8 @@ import discord
 
 import dbUtils
 import utils
+def sendMessage():
+	#Insert here
 def log(sendToDiagnostics):
 	#Insert here
 
@@ -18,8 +20,12 @@ def onReady(client):
 
 def onMessage(client, message):
 	print(message.content)
+	#Parse message
+	#Find command module, (Might be overridden)
+	#Execute module function
 
 def serverSetup(client, guild):
+	#Check if server 
 	print(client, guild.id)
 	data = {
 		"_id": guild.id,
