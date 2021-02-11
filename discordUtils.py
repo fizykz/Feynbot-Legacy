@@ -29,6 +29,9 @@ def serverSetup(client, guild):
 	print(client, guild.id)
 	data = {
 		"_id": guild.id,
+		"prefix": '>',
+		"roleData": {},
+		"stats": {},
 	}
 	dbUtils.setDiscordObject(data)
 
