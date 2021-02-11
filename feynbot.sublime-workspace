@@ -1,0 +1,729 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"comma",
+				"command_list"
+			],
+			[
+				"as",
+				"asyncio"
+			],
+			[
+				"ini",
+				"initialized"
+			]
+		]
+	},
+	"buffers":
+	[
+		{
+			"file": "main.py",
+			"settings":
+			{
+				"buffer_size": 1052,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "discordUtils.py",
+			"settings":
+			{
+				"buffer_size": 876,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "parser.py",
+			"settings":
+			{
+				"buffer_size": 68,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "dbUtils.py",
+			"settings":
+			{
+				"buffer_size": 424,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "utils.py",
+			"settings":
+			{
+				"buffer_size": 888,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "properties.json",
+			"settings":
+			{
+				"buffer_size": 147,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		},
+		{
+			"file": "toDo.txt",
+			"settings":
+			{
+				"buffer_size": 529,
+				"encoding": "UTF-8",
+				"line_ending": "Windows"
+			}
+		}
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+		[
+			[
+				[
+					"Packages/Python/Python.sublime-build",
+					""
+				],
+				[
+					"Packages/Python/Python.sublime-build",
+					"Syntax Check"
+				]
+			],
+			[
+				"Packages/Python/Python.sublime-build",
+				""
+			]
+		]
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"terminus",
+				"Preferences: Terminus Key Bindings"
+			],
+			[
+				"listp",
+				"Package Control: List Packages"
+			],
+			[
+				"list",
+				"Package Control: List Packages"
+			],
+			[
+				"listpa",
+				"Package Control: List Packages"
+			],
+			[
+				"install pack",
+				"Package Control: Install Package"
+			],
+			[
+				"list package",
+				"Package Control: List Packages"
+			],
+			[
+				"packages",
+				"Package Control: List Unmanaged Packages"
+			],
+			[
+				"remove package \t ",
+				"Package Control: Remove Package"
+			],
+			[
+				"package control",
+				"Package Control: List Packages"
+			],
+			[
+				"indent",
+				"Indent XML"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"xml",
+				"Snippet: XML Processing Instruction"
+			],
+			[
+				"Package Control: ",
+				"Package Control: Discover Packages"
+			],
+			[
+				"diff",
+				"Diffy Compare"
+			],
+			[
+				"diffy",
+				"Diffy Compare"
+			],
+			[
+				"instal",
+				"Package Control: Install Package"
+			],
+			[
+				"ren",
+				"Rename File"
+			],
+			[
+				"rename",
+				"Rename File"
+			],
+			[
+				"theme",
+				"UI: Select Theme"
+			],
+			[
+				"THEME",
+				"UI: Select Theme"
+			],
+			[
+				"terminus key",
+				"Preferences: Terminus Key Bindings"
+			],
+			[
+				"terminus set",
+				"Preferences: Terminus Settings"
+			],
+			[
+				"Package Control: inst",
+				"Package Control: Install Package"
+			],
+			[
+				"folder",
+				"Project: Add Folder"
+			],
+			[
+				"Package Control: ins",
+				"Package Control: Install Package"
+			],
+			[
+				"Install Package Control",
+				"Install Package Control"
+			]
+		],
+		"width": 0.0
+	},
+	"console":
+	{
+		"height": 246.0,
+		"history":
+		[
+			"pip",
+			"reload",
+			"cd",
+			"git",
+			"print(\"Test\")",
+			"npm",
+			"node",
+			"help",
+			"echo",
+			"node"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/C/Users/Thomas/Master/Projects/DiscordBots/Feynbot"
+	],
+	"file_history":
+	[
+		"/C/Users/Thomas/Master/Projects/DiscordBots/Feynbot/commandParser.py",
+		"/C/Users/Thomas/Master/Downloads/message.txt",
+		"/C/Users/Thomas/Master/Projects/DiscordBots/Feynbot/dbUtils",
+		"/C/Users/Thomas/Master/Projects/DiscordBots/Feynbot/README.md",
+		"/C/Users/Thomas/Master/Projects/DiscordBots/Feynbot/properties.json",
+		"/C/Users/Thomas/Master/Projects/DiscordBots/Feynbot/main.py",
+		"/C/Users/Thomas/Master/Projects/DiscordBots/Feynbot/.gitattributes",
+		"/C/Users/Thomas/Master/Projects/Categories/DiscordBots/Feynbot/properties.json",
+		"/C/Users/Thomas/Master/Projects/Categories/DiscordBots/ToDo.txt",
+		"/C/Users/Thomas/Master/Downloads/Untitled spreadsheet - Sheet1.csv",
+		"/C/Program Files (x86)/Steam/steamapps/common/RimWorld/Data/Royalty/Defs/AbilityDefs/Abilities.xml",
+		"/C/Program Files (x86)/Steam/steamapps/workshop/content/294100/2099341696/Defs/ExtraPsycastDefs.xml",
+		"/C/Program Files (x86)/Steam/steamapps/workshop/content/294100/2099341696/Defs/HediffDefs.xml",
+		"/C/Program Files (x86)/Steam/steamapps/workshop/content/294100/2099341696/Defs/DamagesDefs.xml",
+		"/C/Program Files (x86)/Steam/steamapps/workshop/content/294100/2036349987/Defs/AbilityDefs/Abilities.xml",
+		"/C/Program Files (x86)/Steam/steamapps/common/RimWorld/Mods/CombatExtended-Development/Royalty/Patches/AbilityDefs/Abilities.xml",
+		"/C/Program Files (x86)/Steam/steamapps/workshop/content/294100/2067686465/Defs/PsychoCasts.xml",
+		"/C/Program Files (x86)/Steam/steamapps/workshop/content/294100/2099341696/Defs/ThoughtDefs.xml",
+		"/C/Program Files (x86)/Steam/steamapps/workshop/content/294100/2067686465/Defs/Hediffs_PsychoCasts.xml",
+		"/C/Program Files (x86)/Steam/steamapps/workshop/content/294100/1914064942/1.0/Patches/CombatExtendedPatch.xml",
+		"/C/Program Files (x86)/Steam/steamapps/workshop/content/294100/1541250497/About/About.xml",
+		"/C/Program Files (x86)/Steam/steamapps/common/RimWorld/Data/Royalty/Defs/AbilityDefs/AbilityCategories.xml",
+		"/C/Users/Thomas/Master/Desktop/Rimworld/OnlineCity/Bin/World/Settings.json",
+		"/C/Users/Thomas/AppData/LocalLow/Ludeon Studios/RimWorld by Ludeon Studios/Config/ModsConfig.xml",
+		"/C/Users/Thomas/AppData/LocalLow/Ludeon Studios/RimWorld by Ludeon Studios/ModLists/Tom's Pack.xml",
+		"/C/Users/Thomas/Master/Desktop/Rimworld/OnlineCity/Bin/ServerOnlineCity.runtimeconfig.dev.json",
+		"/C/Users/Thomas/Master/Desktop/Rimworld/OnlineCity/Bin/ServerOnlineCity.runtimeconfig.json",
+		"/C/Users/Thomas/Master/Desktop/Rimworld/OnlineCity/Bin/ServerOnlineCity.deps.json",
+		"/C/Program Files (x86)/Steam/steamapps/common/RimWorld/Data/Royalty/Defs/HediffDefs/Hediffs_Psycasts.xml",
+		"/C/Program Files (x86)/Steam/steamapps/workshop/content/294100/2036349987/RWoM_Psycasts/Defs/AbilitiesDef/Abilities.xml",
+		"/C/Program Files (x86)/Steam/steamapps/workshop/content/294100/1631756268/About/About.xml",
+		"/C/Program Files (x86)/Steam/steamapps/workshop/content/294100/1631756268/Patches/Vanilla Animals Expanded/CatsAndDogs_Cats.xml",
+		"/C/Program Files (x86)/Steam/steamapps/common/RimWorld/Mods/CombatExtendedLatest/About/About.xml",
+		"/C/Users/Thomas/AppData/LocalLow/Ludeon Studios/RimWorld by Ludeon Studios/Saves/Knights Templar - Copy.rws",
+		"/C/Users/Thomas/AppData/LocalLow/Ludeon Studios/RimWorld by Ludeon Studios/Saves/Knights Templar.rws",
+		"/C/Program Files (x86)/Steam/steamapps/common/RimWorld/Mods/__LocalCopy_Ammo Tweaks for Combat Extended_-5-1/About/About.xml",
+		"/C/Program Files (x86)/Steam/steamapps/common/RimWorld/Mods/__LocalCopy_Engraved Walls_-4-1/About/About.xml",
+		"/C/Program Files (x86)/Steam/steamapps/common/RimWorld/Data/Core/Defs/ThingDefs_Buildings/Buildings_Natural.xml",
+		"/C/Program Files (x86)/Steam/steamapps/common/RimWorld/Mods/__LocalCopy_Engraved Walls_-4-1/Defs/Jobs_Work.xml",
+		"/C/Program Files (x86)/Steam/steamapps/common/RimWorld/Mods/__LocalCopy_Engraved Walls_-4-1/Defs/WorkGivers.xml",
+		"/C/Program Files (x86)/Steam/steamapps/common/RimWorld/Mods/__LocalCopy_Engraved Walls_-4-1/Defs/Designations.xml",
+		"/C/Program Files (x86)/Steam/steamapps/common/RimWorld/Mods/__LocalCopy_Engraved Walls_-4-1/Patches/VanillaPatches.xml",
+		"/C/Program Files (x86)/Steam/steamapps/common/RimWorld/Mods/__LocalCopy_Engraved Walls_-4-1/Defs/ArtDescription_EngravedWall.xml",
+		"/C/Program Files (x86)/Steam/steamapps/common/RimWorld/Mods/__LocalCopy_Engraved Walls_-4-1/1.2/Assemblies/EngravedWalls.dll",
+		"/C/Program Files (x86)/Steam/steamapps/common/RimWorld/Mods/__LocalCopy_Engraved Walls_-4-1/About/PublishedFileId.txt",
+		"/C/Program Files (x86)/Steam/steamapps/common/RimWorld/Mods/__LocalCopy_Engraved Walls_-4-1/About/Changelog.txt",
+		"/C/Program Files (x86)/Steam/steamapps/common/RimWorld/Mods/__LocalCopy_Smooth Walls_-4-1/Defs/SmoothWall.xml",
+		"/C/Program Files (x86)/Steam/steamapps/common/RimWorld/steam_appid.txt",
+		"/C/Program Files (x86)/Steam/steamapps/common/RimWorld/ModUpdating.txt",
+		"/C/Users/Thomas/AppData/LocalLow/Ludeon Studios/RimWorld by Ludeon Studios/steam_autocloud.vdf",
+		"/C/Users/Thomas/Master/Desktop/Skyfactory 3 Server/config/oreexcavation.cfg",
+		"/C/Users/Thomas/AppData/LocalLow/Ludeon Studios/RimWorld by Ludeon Studios/Config/Prefs.xml",
+		"/C/Users/Thomas/Master/Downloads/Rimwolrd/Bin/ServerOnlineCity.runtimeconfig.json",
+		"/C/Users/Thomas/Master/Downloads/Rimwolrd/Bin/ServerOnlineCity.deps.json",
+		"/C/Program Files (x86)/Steam/steamapps/common/RimWorld/EULA.txt",
+		"/C/Program Files (x86)/Steam/steamapps/common/RimWorld/Mods/__LocalCopy_Wulfs Aloe Vera_-29-12/About/About.xml",
+		"/C/Program Files (x86)/Steam/steamapps/common/RimWorld/Mods/Place mods here.txt",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/config/mysticalworld.cfg",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/config/botania.cfg",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/config/astralsorcery.cfg",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/mods/OpenTerrainGenerator/worlds/BBOP/WorldConfig.ini",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/config/biomesoplenty/misc.cfg",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/config/biomesoplenty/world.json",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/config/astralsorcery/treasure_shrine.cfg",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/config/astralsorcery/perk_void_trash_replacement.cfg",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/config/astralsorcery/mineralis_ritual.cfg",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/config/astralsorcery/herdable_animals_blacklist.cfg",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/config/astralsorcery/fluid_rarities.cfg",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/config/astralsorcery/amulet_enchantments.cfg",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/config/astralsorcery/aevitas_ore_perk.cfg",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/config/randomthings.cfg",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/config/ice_and_fire.cfg",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/config/chococraft.cfg",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/config/xreliquary.cfg",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/config/cyclicmagic.cfg",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/config/lilliputian.cfg",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/config/dungeontactics.cfg",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 4/config/TComplementModules.cfg",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 4/config/dungeontactics.cfg",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 4/config/bloodmoon.cfg",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/config/bloodmoon.cfg",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 4/config/xreliquary.cfg",
+		"/C/Program Files (x86)/Steam/steamapps/workshop/content/294100/2181797616/Patches/Buildings_Misc.xml",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/options.txt",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/1.12.2.json",
+		"/C/Program Files (x86)/Steam/steamapps/workshop/content/294100/2181797616/Patches/Plants_Wild.xml",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 2/startServer.bat",
+		"/C/Program Files (x86)/Steam/steamapps/workshop/content/294100/2016263135/About/About.xml",
+		"/C/Program Files (x86)/Steam/steamapps/workshop/content/294100/2016263135/Defs/Incidents/Incidents_Psychology.xml",
+		"/C/Program Files (x86)/Steam/steamapps/workshop/content/294100/2016263135/Defs/InteractionDefs/Interactions_Psychology.xml",
+		"/C/Program Files (x86)/Steam/steamapps/workshop/content/294100/2016263135/Defs/ThoughtDefs/Thoughts_Memory_Social.xml",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Test/startServer.bat",
+		"/C/Users/Thomas/Master/Desktop/Skyfactory 3 Server/ServerStart.bat",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/settings.bat",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/startServer.bat",
+		"/C/Users/Thomas/AppData/Local/Temp/7zO0A070507/manifest.json",
+		"/C/Users/Thomas/AppData/Roaming/gdlauncher_next/instances/CursedCraft 2/config/infernalmobs.cfg",
+		"/C/Users/Thomas/AppData/Roaming/gdlauncher_next/instances/CursedCraft 2/config/ice_and_fire.cfg",
+		"/C/Users/Thomas/AppData/Roaming/gdlauncher_next/instances/CursedCraft 2/config/battletowers.cfg",
+		"/C/Users/Thomas/AppData/Roaming/gdlauncher_next/instances/CursedCraft 2/config/oreexcavation.cfg",
+		"/C/Users/Thomas/AppData/Roaming/gdlauncher_next/instances/CursedCraft 2/config/hungeroverhaul/HungerOverhaul.cfg",
+		"/C/Users/Thomas/AppData/Roaming/gdlauncher_next/instances/CursedCraft 2/config/harvestcraft.cfg",
+		"/C/Users/Thomas/AppData/Roaming/gdlauncher_next/instances/CursedCraft 2/config/reccomplex.cfg",
+		"/C/Users/Thomas/AppData/Roaming/gdlauncher_next/instances/CursedCraft 2/config/ferdinandsflowers.cfg",
+		"/C/Users/Thomas/AppData/Roaming/gdlauncher_next/instances/CursedCraft 2/config/enderio/enderiomachines.cfg",
+		"/C/Users/Thomas/AppData/Roaming/gdlauncher_next/instances/CursedCraft 2/config/enderio/enderioendergy.cfg",
+		"/C/Users/Thomas/AppData/Roaming/gdlauncher_next/instances/CursedCraft 2/config/enderio/enderiopowertools.cfg",
+		"/C/Users/Thomas/AppData/Roaming/gdlauncher_next/instances/CursedCraft 2/config/enderio/painter_paint_sources_core.xml",
+		"/C/Users/Thomas/AppData/Roaming/gdlauncher_next/instances/CursedCraft 2/config/enderio/painter_paint_sources_user.xml",
+		"/C/Users/Thomas/AppData/Roaming/gdlauncher_next/instances/CursedCraft 2/config/enderio/enderio.cfg",
+		"/C/Users/Thomas/AppData/Roaming/gdlauncher_next/instances/CursedCraft 2/config/fastbench.cfg",
+		"/C/Users/Thomas/AppData/Roaming/gdlauncher_next/instances/CursedCraft 2/config/jeresources/jeresources.cfg",
+		"/C/Users/Thomas/AppData/Roaming/gdlauncher_next/instances/CursedCraft 2/config/jei/jei.cfg",
+		"/C/Users/Thomas/AppData/Roaming/gdlauncher_next/instances/CursedCraft 2/config/jeivillagers.cfg",
+		"/C/Users/Thomas/AppData/Roaming/gdlauncher_next/instances/CursedCraft 2/config/jeiintegration.cfg",
+		"/C/Users/Thomas/AppData/Roaming/gdlauncher_next/instances/CursedCraft 2/config/darkness.cfg",
+		"/C/Users/Thomas/AppData/Roaming/gdlauncher_next/instances/CursedCraft 2/config/exoticbirds.cfg",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/config/hungeroverhaul/HungerOverhaul.cfg",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/server.properties",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/config/ichunutil.cfg",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/crash-reports/crash-2020-12-25_04.08.18-server.txt",
+		"/C/Users/Thomas/AppData/Roaming/gdlauncher_next/instances/Cursed/options.txt",
+		"/C/Users/Thomas/AppData/Roaming/gdlauncher_next/instances/Cursed/config.json",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 1/eula.txt",
+		"/C/Users/Thomas/Master/Desktop/CursedCraft Server/Instance 2/settings.bat",
+		"/C/Users/Thomas/Master/Desktop/Skyfactory 3 Server/settings.bat",
+		"/C/Users/Thomas/AppData/Roaming/gdlauncher_next/config",
+		"/C/Users/Thomas/AppData/Roaming/gdlauncher_next/Preferences"
+	],
+	"find":
+	{
+		"height": 24.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"discordutils"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"dUtils"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"selected": 0,
+			"sheets":
+			[
+				{
+					"buffer": 0,
+					"file": "main.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1052,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								343,
+								343
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "discordUtils.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 876,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								106,
+								106
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "parser.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 68,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								51,
+								51
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "dbUtils.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 424,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								389,
+								389
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 3,
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "utils.py",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 888,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								888,
+								888
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Python/Python.sublime-syntax",
+							"tab_size": 5,
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "properties.json",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 147,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								145,
+								145
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/JavaScript/JSON.sublime-syntax"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 5,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "toDo.txt",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 529,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								529,
+								529
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				}
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 24.0
+	},
+	"input":
+	{
+		"height": 39.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.SublimeLinter":
+	{
+		"height": 0.0
+	},
+	"output.Terminus":
+	{
+		"height": 213.0
+	},
+	"output.exec":
+	{
+		"height": 227.0
+	},
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "feynbot.sublime-project",
+	"replace":
+	{
+		"height": 71.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"combatex",
+				"294100\\1914064942\\1.0\\Patches\\CombatExtendedPatch.xml"
+			],
+			[
+				"t",
+				"untitled"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				"C:\\Users\\Thomas\\Master\\Projects\\SublimeProjectFiles\\TechersBot.sublime-workspace"
+			]
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": true,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 266.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+		"max_columns": 2
+	}
+}
