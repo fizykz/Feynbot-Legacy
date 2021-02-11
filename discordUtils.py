@@ -7,6 +7,11 @@ import discord
 
 import dbUtils
 import utils
+def log(sendToDiagnostics):
+	#Insert here
+
+def alert(sendToDiagnostics, major):
+	#Insert here
 
 def onReady(client):
 	print("Client ready.")
