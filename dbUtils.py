@@ -14,5 +14,8 @@ dbClient = pymongo.MongoClient('localhost', 27017)
 db = dbClient[properties['database']['name']]
 discordObjects = db['discordObjects']
 
-def setDiscordObject(data):
+def setObject(data, forceOverride):
+	discordObjects.insert_one(data)
+
+def getObject(data, forceOverride):
 	discordObjects.insert_one(data)
