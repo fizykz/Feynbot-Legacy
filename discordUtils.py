@@ -7,6 +7,8 @@ import discord
 
 import dbUtils
 import utils
+
+properties = utils.fileToJson("./properties.json")
 def sendMessage():
 	#Insert here
 def log(sendToDiagnostics):
