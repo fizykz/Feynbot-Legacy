@@ -13,6 +13,15 @@ properties = utils.fileToJson("./properties.json")
 
 
 class MyClient(discord.Client):
+	admins = [
+		395419912845393923, #Main
+		802737417949151293, #Fizykz
+		535697686532456448, #Alt
+	]
+
+	def __init__(self):
+		#Construction
+
 	async def on_ready(self):					#Bot ready to make API commands and is recieving events.
 		dUtils.onReady(client)
 
@@ -31,6 +40,9 @@ class MyClient(discord.Client):
 
 	async def on_guild_unavailable(self, guild):
 		dUtils.onGuildUnavailable(client, guild)
+
+	def isAdmin(client, id):
+		return id in client['admins']
 
 
 
