@@ -429,8 +429,8 @@
 						"selection":
 						[
 							[
-								343,
-								343
+								531,
+								531
 							]
 						],
 						"settings":
@@ -670,7 +670,7 @@
 	"project": "feynbot.sublime-project",
 	"replace":
 	{
-		"height": 71.0
+		"height": 44.0
 	},
 	"save_all_on_build": true,
 	"select_file":
@@ -698,7 +698,7 @@
 		[
 			[
 				"",
-				"C:\\Users\\Thomas\\Master\\Projects\\SublimeProjectFiles\\TechersBot.sublime-workspace"
+				"C:\\Users\\Thomas\\Master\\Projects\\Libraries\\PyParsus\\PyParsus.sublime-project"
 			]
 		],
 		"width": 380.0

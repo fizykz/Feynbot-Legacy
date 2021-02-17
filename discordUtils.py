@@ -9,39 +9,28 @@ import dbUtils
 import utils
 
 properties = utils.fileToJson("./properties.json")
+
+
+
 def sendMessage():
-	#Insert here
-def log(sendToDiagnostics):
-	#Insert here
+	#Check if bot/exception/exclused
+	#Check if command (Server prefix/global prefix)
+	#Pass message/bot to command module.
 
-def alert(sendToDiagnostics, major):
-	#Insert here
+def onReady(bot):
+	bot.log("Logged on and ready.", True, True)
 
-def onReady(client):
-	print("Client ready.")
-
-def onMessage(client, message):
+def onMessage(bot, message):
 	print(message.content)
 	#Parse message
 	#Find command module, (Might be overridden)
 	#Execute module function
 
-def serverSetup(client, guild):
-	#Check if server 
-	print(client, guild.id)
-	data = {
-		"_id": guild.id,
-		"prefix": '>',
-		"roleData": {},
-		"stats": {},
-	}
-	dbUtils.setDiscordObject(data)
-
-def onGuildRemove(client, guild):
+def onGuildRemove(bot, guild):
 	print("Remove", guild.id)
 
-def onGuildAvailable(client, guild):
+def onGuildAvailable(bot, guild):
 	print("Available", guild.id)
 
-def onGuildUnavailable(client, guild):
+def onGuildUnavailable(bot, guild):
 	print("Unavailable", guild.id)
