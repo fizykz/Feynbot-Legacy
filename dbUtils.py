@@ -8,10 +8,10 @@ import discord
 
 import utils
 
-properties = utils.fileToJson("./properties.json")
+data = utils.fileToJson("./data.json")
 
 dbClient = pymongo.MongoClient('localhost', 27017)
-db = dbClient[properties['database']['name']]
+db = dbClient[data['database']['name']]
 discordObjects = db['discordObjects']
 
 def setObject(data, forceOverride):

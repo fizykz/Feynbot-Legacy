@@ -49,26 +49,27 @@ class MyClient(discord.Client):
 			'roleData': {},
 			'stats': {},
 		}
-		dbUtils.setDiscordObject(data)
+		dbUtils.setObject(data)
 
 	def userSetup(self, user):
-		#Boop
+		return #Boop
 
 
 	async def on_ready(self):					#Bot ready to make API commands and is recieving events.
 		dUtils.onReady(client)
 
+
 	async def on_message(self, message):		#Message recieved: (self, message)
 		dUtils.onMessage(client, message)
+
+
+	async def on_guild_join(self, guild):
+		dUtils.onGuildJoin(client, guild)
 
 	async def on_guild_remove(self, guild):
 		dUtils.onGuildRemove(client, guild)
 
-	async def on_guild_join(self, guild):
-		dUtils.serverSetup(client, guild)
-
 	async def on_guild_available(self, guild):
-		dUtils.serverSetup(client, guild)
 		dUtils.onGuildAvailable(client, guild)
 
 	async def on_guild_unavailable(self, guild):
@@ -81,4 +82,4 @@ class MyClient(discord.Client):
 	
 
 client = MyClient()
-client.run(properties['token'])
+client.run(client.data['token'])
