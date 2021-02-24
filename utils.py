@@ -7,13 +7,6 @@ import inspect
 import pymongo
 import discord
 
-def fileToJson(path):
-	"""Converts a JSON file and returns the table"""
-	jsonObj = None
-	with open(path, 'r') as file:
-		jsonObj = json.load(file)
-	return jsonObj
-
 
 class TaskQueue():
 	def __init__(self):
