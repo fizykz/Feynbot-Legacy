@@ -7,6 +7,13 @@ import inspect
 import pymongo
 import discord
 
+def fileToJson(path):
+	"""Converts a JSON file and returns the table"""
+	jsonObj = None
+	with open(path, 'r') as file:
+		jsonObj = json.load(file)
+	return jsonObj
+
 
 class TaskQueue():
 	def __init__(self):
@@ -25,3 +32,20 @@ class TaskQueue():
 	async def __call__(self):
 		for i in range(len(self.tasks)):
 			self.tasks[i] = await self.tasks[i]		#Wait for each task to complete and store what it returns instead.
+
+
+def fileToJson(path):
+	"""Converts a JSON file and returns the table"""
+	jsonObj = None
+	with open(path, 'r') as file:
+		jsonObj = json.load(file)
+	return jsonObj
+
+
+def iterateDirectory(directory, function):
+	for filename in os.listdir(directory):
+		if filename.endswith(".py"): 
+			print(os.path.join(directory, filename))
+			continue
+		else:
+			continue
