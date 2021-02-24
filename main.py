@@ -9,26 +9,23 @@ import dbUtils
 import discordUtils as dUtils
 
 
-properties = utils.fileToJson('./properties.json')
-
-
 class MyClient(discord.Client):
-	admins = properties['admins']
-	commands = []
-	overrides = []
-	settings = {
-		'verbose': False, 
-		'overrideDiagnostics' : True
-	}
-
 	def __init__(self):
-		#Construction
+		super().__init__()
+		self.commands = []
+		self.overrides = []
+		self.data = utils.fileToJson('./data.json')
+		self.admins = self.data['admins']
+		self.settings = {
+			'verbose': True, 
+			'overrideDiagnostics' : True
+		}	
 
 	def refreshCommands(self):
-		#Iterate over folders, find modules, import.
+		return #Iterate over folders, find modules, import.
 
 	def getCommand(self, id, command):
-		#if overrides[id][command], else return commands[command] if plausible
+		return #if overrides[id][command], else return commands[command] if plausible
 
 	def isAdmin(self, id):
 		return id in client['admins']
@@ -37,10 +34,11 @@ class MyClient(discord.Client):
 		if (not (not self.settings['verbose'] and not necessary)):   #Send all messages except verbose ones when verbose messaging is off.
 			print(message)
 			if sendToDiagnostics or settings['overrideDiagnostics']:
-				#Send to channel
+				return #Send to channel
 
 	def alert(self, message, sendToDiagnostics, major):
-		#Insert here
+		return 1 #Insert here
+
 
 	def serverSetup(self, guild):
 		#Check if server is already contained/setup/updated
