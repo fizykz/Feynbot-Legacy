@@ -4,5 +4,5 @@ def __command(bot, message):
 
 help = {
 	'arguments': [],
-	'summary': "Demonstrates or changes the guild's prefix."
+	'summary': "Restarts the bot."
 }

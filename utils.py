@@ -34,11 +34,3 @@ def fileToJson(path):
 		jsonObj = json.load(file)
 	return jsonObj
 
-
-def iterateDirectory(directory, function):
-	for filename in os.listdir(directory):
-		if filename.endswith(".py"): 
-			print(os.path.join(directory, filename))
-			continue
-		else:
-			continue
