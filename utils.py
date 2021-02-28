@@ -12,7 +12,7 @@ class TaskQueue():
 	def __init__(self):
 		self.tasks = []
 
-	def addTask(self, function, args):
+	def addTask(self, function, *args):
 		task = None
 		if (inspect.iscoroutinefunction(function)):		#Is this function when called a coroutine?
 			task = asyncio.create_task(function(*args))
@@ -34,3 +34,11 @@ def fileToJson(path):
 		jsonObj = json.load(file)
 	return jsonObj
 
+def functionize(coroutine):
+	function = None 
+	if (inspect.iscoroutinefunction(coroutine)):
+		def function(*args):
+			return asyncio.create_task(coroutine(*args))
+	else:
+		return coroutine
+	return function 

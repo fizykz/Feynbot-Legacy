@@ -1,5 +1,5 @@
 
-def __command(bot, message):
+def command(bot, message):
 	return #test
 
 help = {

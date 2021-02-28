@@ -17,5 +17,5 @@ discordObjects = db['discordObjects']
 def setObject(data):
 	discordObjects.insert_one(data)
 
-def getObjectByID(ID, forceOverride=False):
-	return discordObjects.find_one({"_id": ID})
+def getObject(attribute, value, forceOverride=False):
+	return discordObjects.find_one({attribute: value})

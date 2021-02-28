@@ -1,4 +1,4 @@
-#def __command(bot, message, taskQueue, guildData=None):
+#def command(bot, message, taskQueue, guildData=None):
 #	return #whatever
 #
 #help = {
@@ -6,8 +6,7 @@
 #	'summary': ""
 #}
 #
-import 3
-async def __command(bot, message, taskQueue, guildData=None):
+async def command(bot, message, taskQueue, guildData=None):
 	if (bot.isAdmin(message.author.id)):
 		user = bot.utils.stringifyUser(message.author)
 		bot.alert(f"Bot closure ordered by {user}.", True, True)

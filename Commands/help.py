@@ -1,4 +1,4 @@
-#def __command(bot, message, taskQueue, guildData=None):
+#def command(bot, message, taskQueue, guildData=None):
 #	return #whatever
 #
 #help = {
@@ -7,7 +7,7 @@
 #}
 #
 
-def __command(bot, message, taskQueue, guildData=None):
+def command(bot, message, taskQueue, guildData=None):
 	bot.log("Hey this worked!")
 
 help = {
