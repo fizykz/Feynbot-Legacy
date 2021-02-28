@@ -8,9 +8,12 @@
 #
 
 def __command(bot, message, taskQueue, guildData=None):
-	bot.log("Hey this worked!")
+	if (bot.isAdmin(message.author.id)):
+		user = bot.utils.stringifyUser(message.author)
+		bot.alert(f"Command ordered by {user}.", True, True)
+		bot.reloadCommands()
 
 help = {
 	'arguments': [],
-	'summary': "Provides help for general use of the bot or a specific command."
+	'summary': "Reloads all commands."
 }

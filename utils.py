@@ -12,13 +12,13 @@ class TaskQueue():
 	def __init__(self):
 		self.tasks = []
 
-	def addTask(self, function):
+	def addTask(self, function, args):
 		task = None
 		if (inspect.iscoroutinefunction(function)):		#Is this function when called a coroutine?
-			task = asyncio.create_task(function())
+			task = asyncio.create_task(function(*args))
 		else:
 			async def cofunction():					#Have the function be wrapped in an asynchronus function to make it return a coroutine.
-				return function()
+				return function(*args)
 			task = asyncio.create_task(cofunction())
 		self.tasks.append(task)
 
