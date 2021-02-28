@@ -1,6 +1,3 @@
-
-
-
 def process(bot, message):
 	return [message.channel.id, message.guild.id, message.author.id]
 
@@ -12,7 +9,6 @@ async def event(bot, message):
 	#Check if bot/exception/excluded or permissions are missing.
 	#Check if command (Server prefix/global prefix)
 	#Pass message/bot to command module.
-	print("!!!!")
 	if (message.author.bot): #unless excluded.
 		return
 
@@ -22,18 +18,17 @@ async def event(bot, message):
 		command = re.match(r'^[\@\<\!\w]+\>?\s*([a-z]+)', message.content).group(1)
 	else:
 		guildData = bot.getObjectByID(message.guild.id)
-		prefix = guildData['prefix'] or '>'
+		prefix = guildData and guildData['prefix'] or '>'
 
-	print(guildData, message.guild.id)
 	if (command or message.content.lower().startswith(prefix)):
 		if (not command):
-			command = message.content.lower()[len(guildData and guildData['prefix'] or 1):]
-		commandModule = bot.getCommand(message, command)
-		if (commandModule):
+			command = message.content.lower()[len(guildData and guildData['prefix'] or [1]):]
+		commandFunction = bot.getCommand(message, command)
+		if (commandFunction):
 			bot.log("Found command: \'" + command + "\'")
-			taskQueue = self.utils.TaskQueue()
+			taskQueue = bot.utils.TaskQueue()
 			if (guildData):
-				taskQueue.addTask(commandModule, (bot, message, taskQueue, guildData))
+				taskQueue.addTask(commandFunction, bot, message, guildData)
 			else: 
-				taskQueue.addTask(commandModule, (bot, message, taskQueue))
+				taskQueue.addTask(commandFunction, bot, message)
 			await taskQueue()

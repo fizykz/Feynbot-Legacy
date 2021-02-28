@@ -24,7 +24,7 @@ def serverSetup(bot, guild):
 	dbUtils.setObject(data)
 
 def stringifyUser(author):
-	return author.display_name + '#' + author.discriminator + '(' + author.id + ')'
+	return author.display_name + '#' + str(author.discriminator) + '(' + str(author.id) + ')'
 
 def userSetup(bot, user):
 	return #Boop

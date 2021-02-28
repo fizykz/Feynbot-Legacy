@@ -147,7 +147,6 @@ class MyClient(discord.Client):
 		return None
 
 	def getEvent(self, event, IDs, returnModule = False):
-		print("!!!", event, IDs)
 		for ID in IDs:
 			if (ID in self.eventOverrides and event in self.eventOverrides[ID]):
 				if (returnModule):
@@ -204,10 +203,10 @@ class MyClient(discord.Client):
 		self.reloadEvents()
 
 	def getObjectByID(self, ID, forceOverride=False):
-		dbUtils.getObject('_id', ID, forceOverride)
+		return dbUtils.getObject('_id', ID, forceOverride)
 
 	def getObject(*args):
-		dbUtils.getObject(*args)
+		return dbUtils.getObject(*args)
 
 client = MyClient()
 client.run(client.data['token'])
