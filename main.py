@@ -61,7 +61,7 @@ class MyClient(discord.Client):
 					importlib.reload(self.events[eventName])	#Reload module just in case
 					self.handleEvent(eventName)
 				except SyntaxError as error:
-					self.alert(eventName + ".py errored: " + str(error), SyntaxError)	#Warn us about import errors.
+					self.alert(eventName + ".py errored: " + str(error), True, SyntaxWarning)	#Warn us about import errors.
 		for eventName, module in self.events.items():				#Go over current events, see if any were removed
 			if (not (eventName + '.py') in os.listdir('./Events')):	# Check if it's still in the directory
 				self.events[eventName] = None 	#Remove module.
@@ -81,8 +81,8 @@ class MyClient(discord.Client):
 								self.eventOverrides[ID][eventName] = importlib.import_module('EventOverrides.' + folderName + '.' + eventName)	#Manually import it and store it.
 								importlib.reload(self.eventOverrides[ID][eventName])	#Reload in case it was prior.
 								self.handleEvent(eventName)
-							except SyntaxError as error:
-								self.alert(eventName + ".py errored: " + str(error), SyntaxError)	#Warn if an error was thrown.
+							except SyntaxError as error: 
+								self.alert(eventName + ".py errored: " + str(error), True, SyntaxWarning)	#Warn if an error was thrown.
 			for ID, folder in self.eventOverrides.items():	#Go over current override collections, see if any were removed
 				for eventName in tuple(folder.keys()):	#Go over events in the collections.
 					if (eventName != '__directory'):	#Make sure we're not iterating over the metadata
