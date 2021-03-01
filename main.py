@@ -107,12 +107,15 @@ class MyClient(discord.Client):
 			else: 
 				return self.events[event].event
 		return None
-
 	########################
 	### Command Handling ###
 	########################
 	def reloadCommands(self, overrides=True):
 		self.log('Reloading commands...', True, True)			
+
+		for commandName in tuple(self.commands.keys()):				#Go over current commands, see if any were removed
+			if (not (commandName + '.py') in os.listdir('./Commands')):
+				del self.commands[commandName]
 
 		for fileName in os.listdir('./Commands'):				#Iterate over command files.
 			if (fileName.endswith('.py') and fileName[0:-3].isalnum()):
@@ -120,14 +123,23 @@ class MyClient(discord.Client):
 				try:
 					self.commands[commandName] = importlib.import_module('Commands.' + commandName)
 					importlib.reload(self.commands[commandName])	#Reload module just in case
+					if ('aliases' in self.commands[commandName].help):
+						for alias in self.commands[commandName].help['aliases']:
+							if not (alias in self.commands and self.commands[alias].__name__ != self.commands[commandName].__name__):	#Check to make sure there's not a different module here.
+								self.commands[alias] = self.commands[commandName]
+							else:
+								self.alert(commandName + ".py errored trying to impliment alias \"" + alias + "\" but it was already taken by " + self.commands[alias].__name__ + ".py", True, True)
 				except SyntaxError as error:
-					self.alert(commandName + ".py errored: " + str(error), SyntaxError)
-
-		for commandName, module in self.commands.items():				#Go over current commands, see if any were removed
-			if (not (commandName + '.py') in os.listdir('./Commands')):
-				self.commands[commandName] = None
+					self.alert(commandName + ".py errored: " + str(error), True, SyntaxError)
 
 		if (overrides):
+			for ID in tuple(self.commandOverrides.keys()):				#Go over current commands, see if any were removed
+				folder = self.commandOverrides[ID]
+				for commandName in tuple(folder.keys()):
+					if (commandName != '__directory'):			#Make sure we're not iterating over the metadata
+						if (not (commandName + '.py') in os.listdir(folder['__directory'])):
+							del folder[commandName]
+
 			for folderName in os.listdir('./CommandOverrides'):						#Iterate over override folders.
 				if (re.match(r'\d+', folderName) and not re.match(r'\.', folderName)):
 					ID = re.match(r'\d+', folderName).group(0)
@@ -141,14 +153,15 @@ class MyClient(discord.Client):
 							try:
 								self.commandOverrides[ID][commandName] = importlib.import_module('CommandOverrides.' + folderName + '.' + commandName)
 								importlib.reload(self.commandOverrides[ID][commandName])
+								if ('aliases' in self.commandOverrides[ID][commandName].help):
+									for alias in self.commandOverrides[ID][commandName].help['aliases']:
+										if not (alias in self.commandOverrides[ID] and self.commandOverrides[ID][alias].__name__ != self.self.commandOverrides[ID][commandName].__name__):	#Check to make sure there's not a different module here.
+											self.commandOverrides[ID][alias] = self.commandOverrides[ID][commandName]
+										else:
+											self.alert(commandName + ".py errored trying to impliment alias \"" + alias + "\" but it was already taken by " + self.commandOverrides[ID][alias].__name__ + ".py", True, True)
 							except SyntaxError as error:
-								self.alert(commandName + ".py errored: " + str(error), SyntaxError)
+								self.alert(commandName + ".py errored: " + str(error), True, SyntaxError)
 
-			for ID, folder in self.commandOverrides.items():				#Go over current commands, see if any were removed
-					for commandName in tuple(folder.keys()):
-						if (commandName != '__directory'):			#Make sure we're not iterating over the metadata
-							if (not (commandName + '.py') in os.listdir(folder['__directory'])):
-								del folder[commandName]
 
 		self.log('Commands reloaded.', False, True)
 		return #Iterate over folders, find modules, import.
@@ -160,7 +173,7 @@ class MyClient(discord.Client):
 				return module
 			else:
 				return module.command
-		if (message.guild.id in self.commandOverrides and command in self.commandOverrides[message.guild.id]):
+		if (message.guild and message.guild.id in self.commandOverrides and command in self.commandOverrides[message.guild.id]):
 			module = self.commandOverrides[message.guild.id][command]
 			if (returnModule):
 				return module
