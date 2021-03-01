@@ -12,7 +12,6 @@ import discord
 
 import utils
 import dbUtils
-import discordUtils as dUtils
 
 
 class MyClient(discord.Client):
