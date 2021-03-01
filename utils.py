@@ -29,9 +29,17 @@ class TaskQueue():
 
 def resolveBooleanPrompt(string):
 	string = string.lower()
-	if (re.match(r'y[a-z]*\s*$', string) or re.match(r'enabl[a-z]*\s*$', string) or re.match(r'true\s*$', string) or re.match(r'on\s*$', string) or re.match(r't\s*$', string)):
+	string = re.sub(r' .*', ' ', string)
+	string = re.sub(r'[^A-Za-z0-9 ]', '', string)
+
+	accepted = re.match(r'y[a-z]*\s*$', string) or re.search(r'enabl[a-z]*\s*$', string) or re.search(r'true\s*$', string) or re.search(r'on\s*$', string) or re.search(r't\s*$', string)
+	denied = re.match(r'n[a-z]*\s*$', string) or re.search(r'disabl[a-z]*\s*$', string) or re.search(r'false\s*$', string) or re.search(r'off\s*$', string) or re.search(r'f\s*$', string)
+	
+	if (accepted and denied):
+		return None
+	elif (accepted):
 		return True
-	elif (re.match(r'n[a-z]*\s*$', string) or re.match(r'disabl[a-z]*\s*$', string) or re.match(r'false\s*$', string) or re.match(r'off\s*$', string) or re.match(r'f\s*$', string)):
+	elif (denied):
 		return False
 	return None
 
