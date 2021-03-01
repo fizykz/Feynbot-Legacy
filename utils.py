@@ -3,6 +3,7 @@ import numpy
 import os 
 import asyncio
 import inspect
+import re
 
 import pymongo
 import discord
@@ -26,6 +27,13 @@ class TaskQueue():
 		for i in range(len(self.tasks)):
 			self.tasks[i] = await self.tasks[i]		#Wait for each task to complete and store what it returns instead.
 
+def resolveBooleanPrompt(string):
+	string = string.lower()
+	if (re.match(r'y[a-z]*\s*$', string) or re.match(r'enabl[a-z]*\s*$', string) or re.match(r'true\s*$', string) or re.match(r'on\s*$', string) or re.match(r't\s*$', string)):
+		return True
+	elif (re.match(r'n[a-z]*\s*$', string) or re.match(r'disabl[a-z]*\s*$', string) or re.match(r'false\s*$', string) or re.match(r'off\s*$', string) or re.match(r'f\s*$', string)):
+		return False
+	return None
 
 def fileToJson(path):
 	"""Converts a JSON file and returns the table"""
@@ -42,3 +50,6 @@ def functionize(coroutine):
 	else:
 		return coroutine
 	return function 
+
+def stringifyUser(author):
+	return author.display_name + '#' + str(author.discriminator) + '(' + str(author.id) + ')'

@@ -13,16 +13,22 @@ async def event(bot, message):
 		return
 
 	prefix = None
+	data = None
 	command = None
 	if (message.content.startswith('<@!806400496905748571> ') or message.content.startswith('<@806400496905748571> ') or message.content.lower().startswith('@feynbot ')):
 		command = re.match(r'^[\@\<\!\w]+\>?\s*([a-z]+)', message.content).group(1)
 	else:
-		guildData = bot.getObjectByID(message.guild.id)
-		prefix = guildData and guildData['prefix'] or '>'
+		if (message.guild):
+			data = bot.getObjectByID(message.guild.id)
+			if (not data):
+				bot.setupServer(message.guild)
+		else:
+
+		prefix = data and data['prefix'] or '>'
 
 	if (command or message.content.lower().startswith(prefix)):
 		if (not command):
-			command = message.content.lower()[len(guildData and guildData['prefix'] or [1]):]
+			command = message.content.lower()[len(prefix):]
 		commandFunction = bot.getCommand(message, command)
 		if (commandFunction):
 			bot.log("Found command: \'" + command + "\'")
