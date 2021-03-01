@@ -25,6 +25,7 @@ class MyClient(discord.Client):
 		self.data = utils.fileToJson('./data.json')
 		self.privateData = utils.fileToJson('./private.json')
 		self.utils = utils
+		self.frequentEmojis = {}
 		self.settings = {
 			'verboseMessaging': True, 
 			'overrideDiagnostics' : True
@@ -34,6 +35,8 @@ class MyClient(discord.Client):
 		self.log("Logged on and ready.", False, True)
 		self.reloadCommands()
 		self.reloadEvents()
+		for name, emojiID in self.data['emojis'].items():
+			self.frequentEmojis[name] = self.get_emoji(emojiID)
 
 	######################
 	### Event Handling ###
@@ -177,6 +180,18 @@ class MyClient(discord.Client):
 	#################
 	def isAdmin(self, id):
 		return id in self.admins['admins']
+
+	def getFrequentEmoji(self, name):
+		if (name in self.frequentEmojis):
+			return str(self.frequentEmojis[name]) or ""
+		else:
+			return ""
+
+	def stringifyUser(self, author):
+		return author.display_name + '#' + str(author.discriminator) + ' (' + str(author.id) + ')'
+
+	def parseString(self, string):
+		return []
 
 	def log(self, message, verbose=True, sendToDiagnostics=False):
 		if (not (not self.settings['verboseMessaging'] and verbose)):   #Send all messages except verbose ones when verbose messaging is off.  Send_verbose nand Verbose
