@@ -34,7 +34,7 @@ def resolveBooleanPrompt(string):
 
 	accepted = re.match(r'y[a-z]*\s*$', string) or re.search(r'enabl[a-z]*\s*$', string) or re.search(r'true\s*$', string) or re.search(r'on\s*$', string) or re.search(r't\s*$', string)
 	denied = re.match(r'n[a-z]*\s*$', string) or re.search(r'disabl[a-z]*\s*$', string) or re.search(r'false\s*$', string) or re.search(r'off\s*$', string) or re.search(r'f\s*$', string)
-	
+
 	if (accepted and denied):
 		return None
 	elif (accepted):
@@ -55,9 +55,10 @@ def functionize(coroutine):
 	if (inspect.iscoroutinefunction(coroutine)):
 		def function(*args):
 			return asyncio.create_task(coroutine(*args))
+	elif (type(coroutine).__name__ == 'coroutine'):
+		def function(*args):
+			return asyncio.create_task(coroutine)
 	else:
 		return coroutine
 	return function 
 
-def stringifyUser(author):
-	return author.display_name + '#' + str(author.discriminator) + '(' + str(author.id) + ')'
