@@ -250,10 +250,10 @@ class MyClient(discord.Client):
 	def getObjectByID(self, ID, forceOverride=False):
 		return dbUtils.getObject('_id', ID, forceOverride)
 
-	def getObject(*args):
+	def getObject(self, *args):
 		return dbUtils.getObject(*args)
 
-	def setObject(*args):
+	def setObject(self, *args):
 		dbUtils.setObject(data)
 
 	def setupServer(self, guild):
@@ -265,6 +265,7 @@ class MyClient(discord.Client):
 			'prefix': '>',
 			'roleData': {},
 			'stats': {},
+			'disabledCommands': [],
 			'roleInfo': {
 				'starter': [],
 				'verification': [],
