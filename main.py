@@ -185,13 +185,14 @@ class MyClient(discord.Client):
 			else:
 				return module.command
 		return None
-
-
 	#################
 	### Utilities ###
 	#################
+	def isOwner(self, id):
+		return id in self.data['owner']
+
 	def isAdmin(self, id):
-		return id in self.admins['admins']
+		return id in self.data['admins'] or id in self.data['owner']
 
 	def getFrequentEmoji(self, name):
 		if (name in self.frequentEmojis):
