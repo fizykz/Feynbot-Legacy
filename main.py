@@ -184,11 +184,11 @@ class MyClient(discord.Client):
 			if sendToDiagnostics or self.settings['overrideDiagnostics']:
 				return #Send to channel
 
-	def alert(self, message, warning=UserWarning, sendToDiagnostics=False, major=False):
-		prefix = "ALERT: \t"
-		if (major):
-			prefix = "MAJOR: \t"
-		print(Prefix + str(message))
+	def alert(self, message, sendToDiagnostics=False, error=False):
+		if (error):
+			warnings.warn(message, UserWarning)
+		else:
+			print("ALERT: \t" + str(message))
 		if sendToDiagnostics or self.settings['overrideDiagnostics']:
 			#send to major or minor depending on the argument 
 			return #Send to channel
