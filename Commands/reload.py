@@ -7,7 +7,7 @@
 #}
 #
 
-def command(bot, message, guildData=None):
+async def command(bot, message, guildData=None):
 	if (bot.isAdmin(message.author.id)):
 		bot.runConcurrently(message.add_reaction(bot.getFrequentEmoji('accepted')))
 		user = bot.stringifyUser(message.author)

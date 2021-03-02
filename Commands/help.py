@@ -7,7 +7,7 @@
 #}
 #
 
-def command(bot, message, guildData=None):
+async def command(bot, message, guildData=None):
 	bot.log("Hey this worked!")
 
 help = {
