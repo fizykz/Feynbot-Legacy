@@ -15,7 +15,10 @@ db = dbClient[DBData['database']['name']]
 discordObjects = db['discordObjects']
 
 def setObject(data):
-	discordObjects.insert_one(data)
+	return discordObjects.insert_one(data)
 
 def getObject(attribute, value, forceOverride=False):
 	return discordObjects.find_one({attribute: value})
+
+def getObjectByID(ID, forceOverride = False):
+	return getObject('_id', ID, forceOverride)
