@@ -27,10 +27,9 @@ async def command(bot, message, guildData=None):
 	if (bot.isOwner(user.id)):	#Make sure the messenger is the owner.
 		if not (not bot.settings['safelock'] and bot.settings['livingCode']):	#Make sure we're allowing code to run.
 			bot.safelock()	#If we aren't safelock the bot because we should be knowing better.
-			await bot.runConcurrently(#Message/react that no code was ran.
+			bot.runConcurrently(#Message/react that no code was ran.
 				bot.addReaction(message, bot.getFrequentEmoji('denied')),
 				bot.sendMessage(message.channel, "Executing code has been disabled."),
-				return_exceptions = True
 			)
 			return 
 		
@@ -71,7 +70,7 @@ async def command(bot, message, guildData=None):
 			try:
 				bot.addReaction(message, bot.getFrequentEmoji('repeat'))	#Ask user if we want to repeat.
 				await bot.wait_for('reaction_add', timeout=60.0, check=checkFunction)	#wait until user reacts or a timeout of a minute
-			except asyncio.TimeoutError:
+			except asyncio.TimeoutError as error:
 				bot.removeReaction(message, bot.getFrequentEmoji('repeat'))	#remove the reaction if they didn't
 				return
 			else:
