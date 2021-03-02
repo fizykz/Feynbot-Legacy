@@ -179,24 +179,18 @@ class FenynbotClass(discord.Client):
 		return #Iterate over folders, find modules, import.
 
 	def getCommand(self, message, command, returnModule = False):
+		module = None
 		if (message.channel.id in self.commandOverrides and command in self.commandOverrides[message.channel.id]):
 			module = self.commandOverrides[message.channel.id][command]
-			if (returnModule):
-				return module
-			else:
-				return module.command
-		if (message.guild and message.guild.id in self.commandOverrides and command in self.commandOverrides[message.guild.id]):
+		elif (message.guild and message.guild.id in self.commandOverrides and command in self.commandOverrides[message.guild.id]):
 			module = self.commandOverrides[message.guild.id][command]
-			if (returnModule):
-				return module
-			else:
-				return module.command
-		if (command in self.commands):
+		elif (command in self.commands):
 			module = self.commands[command]
-			if (returnModule):
-				return module
-			else:
-				return module.command
+
+		if (returnModule):	
+			return module
+		else:
+			return module.command
 		return None
 	#################
 	### Utilities ###
