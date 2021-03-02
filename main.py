@@ -14,7 +14,7 @@ import discord
 import utils
 import dbUtils
 
-class MyClient(discord.Client):
+class FenynbotClass(discord.Client):
 	def __init__(self):
 		super().__init__()
 		self.commands = {}
@@ -296,5 +296,5 @@ class MyClient(discord.Client):
 	def setupUser(self, user):
 		return #Boop
 
-client = MyClient()
+client = FenynbotClass()
 client.run(client.privateData['token'])
