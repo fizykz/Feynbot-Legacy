@@ -1,0 +1,8 @@
+{
+	"token": "<DiscordSecretKey>",
+	"database": {
+		"location": "<MongoDBDatabaseIPLocation>",
+		"port": 27017,
+		"name": "<DatabaseName>"
+	}
+}
