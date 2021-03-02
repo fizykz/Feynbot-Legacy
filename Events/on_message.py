@@ -1,4 +1,5 @@
 import re
+import inspect
 
 def process(bot, message):
 	return [message.channel.id, message.guild and message.guild.id or 0, message.author.id]
@@ -45,12 +46,6 @@ async def event(bot, message):
 		commandFunction = bot.getCommand(message, command) 
 		if (commandFunction):
 			bot.log("Found command: \'" + command + "\'")
-			taskQueue = bot.utils.TaskQueue()
-			if (data):
-				taskQueue.addTask(commandFunction, bot, message, data)
-			else: 
-				taskQueue.addTask(commandFunction, bot, message)
-			await taskQueue()			try:
 			try:
 				if (inspect.iscoroutinefunction(commandFunction)):
 					return await commandFunction(bot, message, data)
