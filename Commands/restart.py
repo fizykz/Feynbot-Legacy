@@ -9,7 +9,7 @@
 
 async def command(bot, message, guildData=None):
 	if (bot.isAdmin(message.author.id)):
-		await message.add_reaction(bot.getFrequentEmoji('accepted'))
+		await bot.addReaction(message, bot.getFrequentEmoji('accepted'))
 		user = bot.stringifyUser(message.author)
 		bot.alert(f"Restart ordered by {user}.", True)
 		await bot.restart()
