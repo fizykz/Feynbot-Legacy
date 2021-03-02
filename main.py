@@ -32,15 +32,21 @@ class FenynbotClass(discord.Client):
 		}
 		self.settings = {
 			'verboseMessaging': True, 
-			'overrideDiagnostics' : True
+			'overrideDiagnostics' : True,
+			'livingCode': True,
+			'safelock': False
 		}
 
 	async def on_ready(self): #Bot ready to make API commands and is recieving events.
+		def checkFunction(message):
+			return (message.content.startswith('<@!806400496905748571>') or message.content.startswith('<@806400496905748571>') or message.content.lower().startswith('@feynbot')) and self.isOwner(message.)
+
 		self.log("Logged on and ready.", False, True)
 		self.reloadCommands()
 		self.reloadEvents()
 		for name, emojiID in self.data['emojis'].items():
 			self.frequentEmojis[name] = self.get_emoji(emojiID)
+		self.wait_for('on_message')
 
 	######################
 	### Event Handling ###
