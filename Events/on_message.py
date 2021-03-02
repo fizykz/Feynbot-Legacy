@@ -1,5 +1,4 @@
 import re
-re.DOTALL = True
 
 def process(bot, message):
 	return [message.channel.id, message.guild and message.guild.id or 0, message.author.id]
@@ -22,9 +21,13 @@ async def event(bot, message):
 	data = None
 	command = None
 	if (message.content.startswith('<@!806400496905748571>') or message.content.startswith('<@806400496905748571>') or message.content.lower().startswith('@feynbot')):
-		command = re.search(r'^[\@\<\!\w]+\>?\s*([a-z]+)', message.content).group(1)
-		command = re.sub(r'\n', r' ', command)
-		command = re.sub(r'^(\w+)\W+.*$', r'\1', command)
+		command = re.search(r'^[\@\<\!\w]+\>?\s*([a-z]+)', message.content, flags=re.S)
+		if command:
+			command = command.group(1)
+		else:
+			return
+		command = re.sub(r'\n', r' ', command, flags=re.S)
+		command = re.sub(r'^(\w+)\W+.*$', r'\1', command, flags=re.S)
 	else:
 		if (message.guild):
 			data = bot.getObjectByID(message.guild.id)
@@ -37,9 +40,9 @@ async def event(bot, message):
 	if (command or message.content.lower().startswith(prefix)):
 		if (not command):
 			command = message.content.lower()[len(prefix):]
-			command = re.sub(r'\n', r' ', command)
-			command = re.sub(r'^(\w+)\W*.*$', r'\1', command)
-		commandFunction = bot.getCommand(message, command)
+			command = re.sub(r'\n', r' ', command, flags=re.S)
+			command = re.sub(r'^(\w+)\W*.*$', r'\1', command, flags=re.S)
+		commandFunction = bot.getCommand(message, command) 
 		if (commandFunction):
 			bot.log("Found command: \'" + command + "\'")
 			taskQueue = bot.utils.TaskQueue()
