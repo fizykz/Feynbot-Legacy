@@ -114,7 +114,7 @@ class FeynbotClass(discord.Client):
 							}
 						if (fileName.endswith('.py')):	#Check to make sure it's a .py file.
 							eventName = fileName[0:-3]	#Get the event name.
-							try:	#Make sure it doesn't error on import
+							try:	#Make sure it doesn't error on import 
 								self.eventOverrides[ID][eventName] = importlib.import_module('EventOverrides.' + folderName + '.' + eventName)	#Manually import it and store it.
 								importlib.reload(self.eventOverrides[ID][eventName])	#Reload in case it was prior.
 								self.handleEvent(eventName)
@@ -208,12 +208,12 @@ class FeynbotClass(discord.Client):
 		self.log('Commands reloaded.', False, True)
 		return #Iterate over folders, find modules, import.
 
-	def getCommand(self, message, command, returnModule = False):
+	def getCommand(self, command, channelID = None, guildID = None, returnModule = False):
 		module = None
-		if (message.channel.id in self.commandOverrides and command in self.commandOverrides[message.channel.id]):
+		if (channelID and channelID in self.commandOverrides and command in self.commandOverrides[channelID]):
 			module = self.commandOverrides[message.channel.id][command]
-		elif (message.guild and message.guild.id in self.commandOverrides and command in self.commandOverrides[message.guild.id]):
-			module = self.commandOverrides[message.guild.id][command]
+		elif (guildID and guildID in self.commandOverrides and command in self.commandOverrides[guildID]):
+			module = self.commandOverrides[guildID][command]
 		elif (command in self.commands):
 			module = self.commands[command]
 
@@ -225,28 +225,74 @@ class FeynbotClass(discord.Client):
 	#################
 	### Utilities ###
 	#################
-	def isOwner(self, id):
-		return id in self.data['owner']
+	def reloadLibraries(self):
+		self.commandInstance = importlib.reload(commandInstance).Class
+		self.utils = importlib.reload(utils)
+		dbUtils = importlib.reload(dbUtils)
 
-	def isAdmin(self, id):
-		return id in self.data['admins'] or id in self.data['owner']
+	def getSetting(self, setting):
+		if (setting in self.settings):
+			return self.settings[setting]
+
+	def setSetting(self, setting, state):
+		if (setting == 'safelock'):
+			self.safelock()
+			self.clearAdmins()
+			self.alert("Safelock was attempted to be overridden!", True, True)
+		if (setting in self.settings):
+			self.settings[setting] = state
+
+	def getClass(self):	
+		return self.__class__
+
+	def isOwner(self, ID, canBeSelf = False):
+		return ID in self.state['owner'] and (ID != self.user.id or canBeSelf)
+
+	def isAdmin(self, ID, canBeSelf = False):
+		return ID in self.state['admins'] or self.isOwner(ID, canBeSelf)
+
+	def isModerator(self, ID, canBeSelf = False):
+		return ID in self.state['moderator'] or self.isAdmin(ID, canBeSelf)
+
+	def isBanned(self, ID):
+		return ID in self.state['bannedUsers']
+
+	def addBanned(self, ID):
+		self.state['bannedUsers'].append(ID)
+
+	def clearAdmins(ownersToo = True):
+		self.data['admins'] = []
+		if (ownersToo):
+			self.data['owner'] = []
+
+	def getPermissionLevel(self, ID, canBeSelf = False):
+		if (self.isOwner(ID, canBeSelf)):
+			return config['levels']['owner']
+		elif (self.isAdmin(ID)):
+			return config['levels']['admin']
+		elif (self.isBanned(ID)):
+			return config['levels']['moderator']
+		elif (self.isBanned(ID)):
+			return config['levels']['banned']
+		else:
+			return config['levels']['user']
 
 	def safelock(self):
 		self.settings['safelock'] = False
 
-	def sendMessage(self, channel, *args, **kwargs):
+	def sendMessage(self, channel, *args, concurrently = False, **kwargs):
 		return self.addTask(channel.send(*args, **kwargs))
 
-	def editMessage(self, message, *args, **kwargs):
+	def editMessage(self, message, *args, concurrently = False, **kwargs):
 		return self.addTask(message.edit(*args, **kwargs))
 
-	def addReaction(self, message, emoji, *args, **kwargs):
-		return self.addTask(message.add_reaction(emoji, *args, **kwargs))
+	def addReaction(self, message, emoji, *args, concurrently = False, **kwargs):
+		return self.addTask(message.add_reaction(emoji, *args, **kwargs)) 
 
-	def removeReaction(self, message, reaction, member = None):
+	def removeReaction(self, message, reaction, concurrently = False, member = None):
 		if (not member):
-			member = self.user 
-		bot.addTask(message.remove_reaction(bot.getFrequentEmoji('repeat'), bot.user))
+			member = self.user
+		return addTask(message.remove_reaction(reaction, member))
 
 	def getFrequentEmoji(self, name):
 		if (name in self.frequentEmojis):
@@ -254,8 +300,10 @@ class FeynbotClass(discord.Client):
 		else:
 			return str(self.frequentEmojis["reportMe"])
 
-	def stringifyUser(self, author):
-		return author.display_name + '#' + str(author.discriminator) + ' (' + str(author.id) + ')'
+	def stringifyUser(self, author, withID = True):
+		if (withID):
+			return author.display_name + '#' + str(author.discriminator) + ' (' + str(author.id) + ')'
+		return author.display_name + '#' + str(author.discriminator)
 
 	def parseString(self, string):
 		return []
@@ -266,17 +314,17 @@ class FeynbotClass(discord.Client):
 			if sendToDiagnostics or self.settings['overrideDiagnostics']:
 				return #Send to channel
 
-	def alert(self, message, sendToDiagnostics=False, error=False):
-		if (error):
-			warnings.warn(message, UserWarning)
+	def alert(self, message, sendToDiagnostics=False, raiseError=False):
+		if (raiseError):
+			raise RuntimeError(message)
 		else:
 			print("ALERT: \t" + str(message))
 		if sendToDiagnostics or self.settings['overrideDiagnostics']:
 			#send to major or minor depending on the argument 
 			return #Send to channel
 
-	async def reactWithBug(self, message):
-		await self.addReaction(message, self.getFrequentEmoji('reportMe'))
+	def reactWithBug(self, message):
+		return self.addReaction(message, self.getFrequentEmoji('reportMe'))
 
 	async def restart(self, endDelay=0, startDelay=0):
 		await asyncio.sleep(endDelay)
@@ -299,22 +347,32 @@ class FeynbotClass(discord.Client):
 	################
 	### Database ###
 	################
-	def getObjectByID(self, ID, forceOverride=False):
-		return dbUtils.getObject('_id', ID, forceOverride)
+	def getGuildData(self, ID, forceOverride = False):
+		data = dbUtils.getObjectByID(ID, forceOverride)
+		if (data):
+			return data
+		guild = self.get_guild(ID)
+		if (guild):
+			return self.setupServer(guild)
 
-	def getObject(self, *args):
-		return dbUtils.getObject(*args)
+	def getUserData(self, ID, preventBanned = True, forceOverride = False):
+		if (preventBanned and self.isBanned(ID)):
+			return False
+		data = dbUtils.getObjectByID(ID, forceOverride)
+		if (data):
+			if (data['banned']):
+				self.addBanned(id)
+				if (preventBanned):
+					return False
+			return data
+		user = self.get_user(ID)
+		if (user):
+			return self.setupUser(user)
 
-	def setObject(self, *args):
-		dbUtils.setObject(data)
-
-	def setupServer(self, guild):
-		if (dbUtils.getObjectByID(guild.id)) :
-			return
-		#Check if server is already contained/setup/updated
+	def setupServer(self, guild):	#Should only be ran if we know the server data is missing.
 		data = {
 			'_id': guild.id,
-			'prefix': '>',
+			'prefix': self.prefix,
 			'roleData': {},
 			'stats': {},
 			'disabledCommands': [],
@@ -324,12 +382,20 @@ class FeynbotClass(discord.Client):
 				'ranks': [],
 				'selection': {},
 			},
-
 		}
-		self.setObject(data)
+		dbUtils.setObject(data)
+		return data 
 
 	def setupUser(self, user):
+		data = {
+			'_id': user.id,
+			'banned': False,
+			'stats': {},
+		}
 		return #Boop
 
-client = FenynbotClass()
-client.run(client.privateData['token'])
+client = None
+if (__name__ == '__main__'):
+	client = FeynbotClass()
+	client.run(privateData['token'])
+
