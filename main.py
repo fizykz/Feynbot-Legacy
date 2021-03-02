@@ -14,7 +14,6 @@ import discord
 import utils
 import dbUtils
 
-
 class MyClient(discord.Client):
 	def __init__(self):
 		super().__init__()
@@ -25,7 +24,12 @@ class MyClient(discord.Client):
 		self.data = utils.fileToJson('./data.json')
 		self.privateData = utils.fileToJson('./private.json')
 		self.utils = utils
-		self.frequentEmojis = {}
+		self.addTask = asyncio.create_task
+		self.sleep = asyncio.sleep
+		self.runConcurrently = asyncio.gather
+		self.frequentEmojis = {
+			"repeat": '🔁'
+		}
 		self.settings = {
 			'verboseMessaging': True, 
 			'overrideDiagnostics' : True
@@ -195,11 +199,28 @@ class MyClient(discord.Client):
 	def isAdmin(self, id):
 		return id in self.data['admins'] or id in self.data['owner']
 
+	def safelock(self):
+		self.settings['safelock'] = False
+
+	def sendMessage(self, channel, *args, **kwargs):
+		return self.addTask(channel.send(*args, **kwargs))
+
+	def editMessage(self, message, *args, **kwargs):
+		return self.addTask(message.edit(*args, **kwargs))
+
+	def addReaction(self, message, emoji, *args, **kwargs):
+		return self.addTask(message.add_reaction(emoji, *args, **kwargs))
+
+	def removeReaction(self, message, reaction, member = None):
+		if (not member):
+			member = self.user 
+		bot.addTask(message.remove_reaction(bot.getFrequentEmoji('repeat'), bot.user))
+
 	def getFrequentEmoji(self, name):
 		if (name in self.frequentEmojis):
-			return str(self.frequentEmojis[name]) or ""
+			return str(self.frequentEmojis[name]) or str(self.frequentEmojis["reportMe"])
 		else:
-			return ""
+			return str(self.frequentEmojis["reportMe"])
 
 	def stringifyUser(self, author):
 		return author.display_name + '#' + str(author.discriminator) + ' (' + str(author.id) + ')'
@@ -239,11 +260,6 @@ class MyClient(discord.Client):
 		except:
 			pass
 		await self.logout()
-
-
-	def sendMessage():
-		return
-
 
 	################
 	### Database ###
