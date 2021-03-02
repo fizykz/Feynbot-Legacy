@@ -1,18 +1,32 @@
 {
-	"owner": [
+	"defaultPrefix": ">",
+
+	"defaultSettings": {
+		"verboseMessaging": true, 
+		"overrideDiagnostics" : true,
+		"livingCode": true,
+		"safelock": false
+	},
+
+	"owners": [
 		395419912845393923,
 		802737417949151293, 
-		535697686532456448,
-		806400496905748571
+		535697686532456448
 	],
+
 	"admins": [
 		366671066699137045
 	],
-	"channels": {
+
+	"moderators": [
+		565415161268142081
+	],
+
+	"linkedChannels": {
 		"info": 809361130245324831,
 		"alerts": 809360908127436820
 	},
-	"botID": 806400496905748571,
+
 	"emojis": {
 		"accepted": 814316280299126794,
 		"denied": 814316281376931890,
@@ -23,5 +37,13 @@
 		"acceptedStatic": 815804106115383338,
 		"deniedStatic": 815804106727489536,
 		"reportMe": 815936904779399188
+	},
+
+	"levels": {
+		"owner": 5,
+		"admin": 4,
+		"moderator": 3,
+		"user": 0,
+		"banned": -1
 	}
 }
