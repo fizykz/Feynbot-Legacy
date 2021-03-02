@@ -14,8 +14,7 @@ async def command(bot, message, guildData=None):
 		bot.alert(f"Reload ordered by {user}.", True)
 		bot.reloadCommands()
 		bot.reloadEvents()
-
-help = {
+info = {
 	'arguments': [],
 	'summary': "Reloads all commands.",
 	'hidden': True

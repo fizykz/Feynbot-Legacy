@@ -133,8 +133,10 @@ class FenynbotClass(discord.Client):
 				try:
 					self.commands[commandName] = importlib.import_module('Commands.' + commandName)
 					importlib.reload(self.commands[commandName])	#Reload module just in case
-					if ('aliases' in self.commands[commandName].help):
-						for alias in self.commands[commandName].help['aliases']:
+					if ('aliases' in self.commands[commandName].info):
+						for alias in self.commands[commandName].info['aliases']:
+							assert alias.isalnum(), "Aliases should be alphanumerical."
+							alias = alias.lower()
 							if not (alias in self.commands and self.commands[alias].__name__ != self.commands[commandName].__name__):	#Check to make sure there's not a different module here.
 								self.commands[alias] = self.commands[commandName]
 							else:
@@ -164,8 +166,10 @@ class FenynbotClass(discord.Client):
 							try:
 								self.commandOverrides[ID][commandName] = importlib.import_module('CommandOverrides.' + folderName + '.' + commandName)
 								importlib.reload(self.commandOverrides[ID][commandName])
-								if ('aliases' in self.commandOverrides[ID][commandName].help):
-									for alias in self.commandOverrides[ID][commandName].help['aliases']:
+								if ('aliases' in self.commandOverrides[ID][commandName].info):
+									for alias in self.commandOverrides[ID][commandName].info['aliases']:
+										assert alias.isalnum(), "Aliases should be alphanumerical."
+										alias = alias.lower()
 										if not (alias in self.commandOverrides[ID] and self.commandOverrides[ID][alias].__name__ != self.self.commandOverrides[ID][commandName].__name__):	#Check to make sure there's not a different module here.
 											self.commandOverrides[ID][alias] = self.commandOverrides[ID][commandName]
 										else:

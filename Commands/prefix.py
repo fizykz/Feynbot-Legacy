@@ -2,7 +2,7 @@
 def command(bot, message):
 	return #test
 
-help = {
+info = {
 	'arguments': [],
 	'summary': "Demonstrates or changes the guild's prefix."
 }

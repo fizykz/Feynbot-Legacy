@@ -13,7 +13,7 @@ async def command(bot, message, guildData=None):
 		ourMessage = await message.channel.send(message.content) 
 		bot.log(message.content, False, False)
 
-help = {
+info = {
 	'name': "Debug",
 	'summary': "Prints message content and sends an identical message.",
 	'hidden': True

@@ -14,7 +14,7 @@ async def command(bot, message, guildData=None):
 		bot.log(f"Restart ordered by {user}.", True, True)
 		await bot.restart()
 
-help = {
+info = {
 	'arguments': [],
 	'summary': "Enables admin access.",
 	'hidden': True

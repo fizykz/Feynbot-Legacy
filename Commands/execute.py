@@ -77,7 +77,7 @@ async def command(bot, message, guildData=None):
 			else:
 				bot.removeReaction(message, bot.getFrequentEmoji('repeat'), user)	#remove their reaction (might error from no permission.)
 
-help = {
+info = {
 	'arguments': [],
 	'aliases': ["exec"],
 	'summary': "Executes a code block, a collection of globals [`bot`, `guild`, `channel`, `author`] are passed as well.",

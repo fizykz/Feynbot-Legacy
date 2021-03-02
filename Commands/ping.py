@@ -15,7 +15,7 @@ async def command(bot, message, guildData=None):
 	total = int((end - start) / datetime.timedelta(microseconds=1) / 1000 / 2) #Microsends in between, divided by 1000 to milli, then divided by two. 
 	await ourMessage.edit(content = bot.getFrequentEmoji('acceptedStatic') + " Pong: " + str(total) + " ms.")
 
-help = {
+info = {
 	'name': "Ping",
 	'aliases': ["p"],
 	'summary': "Measures the average one-way latency for the bot."

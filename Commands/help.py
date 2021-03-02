@@ -10,7 +10,7 @@
 async def command(bot, message, guildData=None):
 	bot.log("Hey this worked!")
 
-help = {
+info = {
 	'arguments': [],
 	'summary': "Provides help for general use of the bot or a specific command."
 }

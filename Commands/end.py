@@ -13,7 +13,7 @@ async def command(bot, message, guildData=None):
 		bot.alert(f"Bot closure ordered by {user}.", True)
 		await bot.end()
 
-help = {
+info = {
 	'arguments': [],
 	'summary': "Restarts the bot."
 }

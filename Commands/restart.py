@@ -13,8 +13,8 @@ async def command(bot, message, guildData=None):
 		user = bot.stringifyUser(message.author)
 		bot.alert(f"Restart ordered by {user}.", True)
 		await bot.restart()
-
-help = {
+info = {
+	'name': "Restart",
 	'arguments': [],
 	'summary': "Restarts the bot.",
 	'hidden': True
