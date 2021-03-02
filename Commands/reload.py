@@ -1,19 +1,10 @@
-#def command(bot, message, taskQueue, guildData=None):
-#	return #whatever
-#
-#help = {
-#	'arguments': [],	
-#	'summary': ""
-#}
-#
+async def command(cmd):
+	if (cmd.isAdmin()):
+		cmd.bot.addReaction(message, cmd.bot.getFrequentEmoji('accepted'))
+		cmd.bot.alert(f"Reload ordered by {cmd.getFullUsername()}.", True)
+		cmd.bot.reloadCommands()
+		cmd.bot.reloadEvents()
 
-async def command(bot, message, guildData=None):
-	if (bot.isAdmin(message.author.id)):
-		bot.addReaction(message, bot.getFrequentEmoji('accepted'))
-		user = bot.stringifyUser(message.author)
-		bot.alert(f"Reload ordered by {user}.", True)
-		bot.reloadCommands()
-		bot.reloadEvents()
 info = {
 	'arguments': [],
 	'summary': "Reloads all commands.",
