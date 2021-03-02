@@ -13,6 +13,8 @@ async def event(bot, message):
 	#Check if command (Server prefix/global prefix)
 	#Pass message/bot to command module.
 	print("String representation:", repr(message.content))
+	if (message.author.id == bot.user.id): #NEVER EVER respond to ourselves.  Huge security risk.
+		return
 	if (message.author.bot): #unless excluded.
 		return
 
@@ -45,4 +47,13 @@ async def event(bot, message):
 				taskQueue.addTask(commandFunction, bot, message, data)
 			else: 
 				taskQueue.addTask(commandFunction, bot, message)
-			await taskQueue()
+			await taskQueue()			try:
+			try:
+				if (inspect.iscoroutinefunction(commandFunction)):
+					return await commandFunction(bot, message, data)
+				else:
+					return commandFunction(bot, message, data)
+			except Exception as error:
+				bot.addTask(message.add_reaction(bot.getFrequentEmoji('reportMe')))	
+				bot.alert("An error was raised when executing " + commandName, True, error)	#Print the error and reject it.
+				raise error

@@ -140,6 +140,7 @@ class FenynbotClass(discord.Client):
 							else:
 								self.alert(commandName + ".py errored trying to impliment alias \"" + alias + "\" but it was already taken by " + self.commands[alias].__name__ + ".py", True, True)
 				except SyntaxError as error:
+					self.commands[commandName] = error 
 					self.alert(commandName + ".py errored: " + str(error), True, SyntaxError)
 
 		if (overrides):
@@ -170,6 +171,7 @@ class FenynbotClass(discord.Client):
 										else:
 											self.alert(commandName + ".py errored trying to impliment alias \"" + alias + "\" but it was already taken by " + self.commandOverrides[ID][alias].__name__ + ".py", True, True)
 							except SyntaxError as error:
+								self.commands[commandName] = error
 								self.alert(commandName + ".py errored: " + str(error), True, SyntaxError)
 
 
@@ -248,6 +250,9 @@ class FenynbotClass(discord.Client):
 		if sendToDiagnostics or self.settings['overrideDiagnostics']:
 			#send to major or minor depending on the argument 
 			return #Send to channel
+
+	async def reactWithBug(self, message):
+		await self.addReaction(message, self.getFrequentEmoji('reportMe'))
 
 	async def restart(self, endDelay=0, startDelay=0):
 		await asyncio.sleep(endDelay)
