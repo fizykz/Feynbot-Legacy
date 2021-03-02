@@ -13,40 +13,60 @@ import discord
 
 import utils
 import dbUtils
+from commandInstance
 
-class FenynbotClass(discord.Client):
+privateData = utils.fileToJson('./private.json')
+config = utils.fileToJson('./config.json')
+
+
+class FeynbotClass(discord.Client):
 	def __init__(self):
 		super().__init__()
-		self.commands = {}
-		self.commandOverrides = {}
-		self.events = {}
-		self.eventOverrides = {}
-		self.data = utils.fileToJson('./data.json')
-		self.privateData = utils.fileToJson('./private.json')
+		self.botClass = self.getClass()
 		self.utils = utils
 		self.addTask = asyncio.create_task
 		self.sleep = asyncio.sleep
 		self.runConcurrently = asyncio.gather
+
 		self.frequentEmojis = {
 			"repeat": '🔁'
 		}
-		self.settings = {
-			'verboseMessaging': True, 
-			'overrideDiagnostics' : True,
-			'livingCode': True,
-			'safelock': False
+
+		self.commands = {}
+		self.commandOverrides = {}
+		self.events = {}
+		self.eventOverrides = {}
+
+		self.prefix = config['defaultPrefix']
+		self.commandInstance = commandInstance.Class
+		self.state = {
+			'levels': config['levels'],
+			'owners': config['owners'],
+			'admins': config['admins'],
+			'moderators': config['moderators'],
+			'channels': config['linkedChannels'],
+			'bannedUsers': [],
 		}
+		self.settings = config['defaultSettings']
 
 	async def on_ready(self): #Bot ready to make API commands and is recieving events.
 		def checkFunction(message):
-			return (message.content.startswith('<@!806400496905748571>') or message.content.startswith('<@806400496905748571>') or message.content.lower().startswith('@feynbot')) and self.isOwner(message.)
+			content = message.content 
+			if (self.isOwner(message.author.id)):
+				cmd = commandInstance.Class(self, message)
+				if (cmd.commandIdentifier == 'unlock'):
+					return True
 
 		self.log("Logged on and ready.", False, True)
 		self.reloadCommands()
 		self.reloadEvents()
-		for name, emojiID in self.data['emojis'].items():
+		for name, emojiID in config['emojis'].items():
 			self.frequentEmojis[name] = self.get_emoji(emojiID)
-		self.wait_for('on_message')
+		try:
+			await self.wait_for('on_message', check=checkFunction, timeout=5)
+		except asyncio.TimeoutError as error:
+			self.log("Safelocking the bot.", True)
+			self.safelock()
 
 	######################
 	### Event Handling ###
@@ -55,8 +75,14 @@ class FenynbotClass(discord.Client):
 		async def handler(*args):
 			IDs = [] #List of IDs to check for when looking for an event override.
 			if (eventName in self.events and hasattr(self.events[eventName], 'process')):
-				IDs = self.events[eventName].process(self, *args)
-			await self.getEvent(eventName, IDs)(self, *args) #Get and run the needed event.
+				process = self.events[eventName].process
+				assert process.__code__.co_argcount - len(process.__defaults__ or ()), "The " + eventName + " process() function has the incorrect number of arguments.  Check Discord.py API reference."
+				IDs = process(self, *args)
+
+			if (inspect.iscoroutinefunction(self.getEvent(eventName, IDs))):
+				return self.addTask(self.getEvent(eventName, IDs)(self, *args))
+			else:
+				return self.getEvent(eventName, IDs)(self, *args)
 
 		handler.__name__ = eventName #Rename the handler to the event name (Discord.py needs this).
 		self.event(handler)	#Use Discord library to hook the event.
