@@ -6,6 +6,7 @@ import re
 import subprocess
 import sys
 import warnings
+import inspect
 
 import pymongo
 import discord
