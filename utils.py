@@ -49,16 +49,3 @@ def fileToJson(path):
 	with open(path, 'r') as file:
 		jsonObj = json.load(file)
 	return jsonObj
-
-def functionize(coroutine):
-	function = None 
-	if (inspect.iscoroutinefunction(coroutine)):
-		def function(*args):
-			return asyncio.create_task(coroutine(*args))
-	elif (type(coroutine).__name__ == 'coroutine'):
-		def function(*args):
-			return asyncio.create_task(coroutine)
-	else:
-		return coroutine
-	return function 
-

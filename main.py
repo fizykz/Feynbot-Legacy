@@ -45,7 +45,7 @@ class MyClient(discord.Client):
 			IDs = [] #List of IDs to check for when looking for an event override.
 			if (eventName in self.events and hasattr(self.events[eventName], 'process')):
 				IDs = self.events[eventName].process(self, *args)
-			utils.functionize(self.getEvent(eventName, IDs))(self, *args) #Get and run the needed event.
+			await self.getEvent(eventName, IDs)(self, *args) #Get and run the needed event.
 
 		handler.__name__ = eventName #Rename the handler to the event name (Discord.py needs this).
 		self.event(handler)	#Use Discord library to hook the event.
