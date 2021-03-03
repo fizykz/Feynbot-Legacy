@@ -13,7 +13,7 @@ import discord
 
 import utils
 import dbUtils
-from commandInstance
+import commandInstance
 
 privateData = utils.fileToJson('./private.json')
 config = utils.fileToJson('./config.json')
