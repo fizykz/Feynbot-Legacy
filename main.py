@@ -55,7 +55,6 @@ class FeynbotClass(discord.Client):
 
 	async def on_ready(self): #Bot ready to make API commands and is recieving events.
 		def unlockCheck(message):	#Function to check for an unlock command.
-			print(1111)
 			if (self.isOwner(message.author.id)):
 				cmd = commandInstance.Class(self, message)
 				if (cmd.commandIdentifier == 'unlock'):
@@ -66,33 +65,38 @@ class FeynbotClass(discord.Client):
 		for name, emojiID in config['emojis'].items():
 			self.frequentEmojis[name] = self.get_emoji(emojiID)
 		try:
-			print(2222)
 			unlockMessage = await self.wait_for('message', check=unlockCheck, timeout=300)
-			PromptPINMessage = self.DMUserFromMessage(unlockMessage, "Please type the administrative PIN.")
-			print(3333)
+			self.addReaction(unlockMessage, self.getFrequentEmoji('accepted'))
+			PromptPINMessage = await self.DMUserFromMessage(unlockMessage, "Please type the administrative PIN.")
 			def DMCheck(message):
-				if (PromptPINMessage.channel == message.channel):
+				if (PromptPINMessage.channel == message.channel and message.author != self.user):
 					return True 
 			try:
 				PINMessage = await self.wait_for('message', check=DMCheck, timeout=60)
-				if (PINMessage.content == privateData['PIN']):
-					return True
-				else:
+				print(PINMessage.content, privateData['PIN'])
+				if (PINMessage.content != privateData['PIN']):
+					self.addReaction(PINMessage, self.getFrequentEmoji('denied'))
 					self.safelock()
 					self.alert("Safelocking the bot after an incorrect PIN attempt.", True)
 					return False
-				print(4444)
-				PromptPINMessage = self.DMUserFromMessage(unlockMessage, "You can now delete your message.\nPlease type the random 2FA SMS just sent to your phone number.")
+				self.addReaction(PINMessage, self.getFrequentEmoji('accepted'))
+				PromptSMSMessage = await self.DMUserFromMessage(unlockMessage, "You can now delete your PIN from this channel.\nPlease type the random 2FA SMS just sent to your phone number.")
 				SMSKey = utils.getRandomString(6)
 				SMS = utils.sendSMS(privateData['phone']['number'], privateData['phone']['carrier'], "Here is your 2FA SMS key: " + SMSKey)
+				if (not SMS):
+					self.replyToMessage(PromptSMSMessage, "An error occured while sending the SMS.")
+					self.alert(f"An error occured with an SMS while undergoing {self.prefix}unlock, the bot has safelocked as a precaution.", True)
+					self.safelock()
+					self.addReaction(PromptSMSMessage, self.getFrequentEmoji('denied'))
 				SMSMessage = await self.wait_for('message', check=DMCheck, timeout=60)
-				print(5555)
-				if (PINMessage.content == SMSKey):
+				if (SMSMessage.content == SMSKey):
 					self.DMUserFromMessage(unlockMessage, "The bot has been unlocked and code execution will be available until end of session or a safelock.")
 					self.alert("The bot has been unlocked and code execution will be available until end of session or a safelock.", True)
 					self.setSetting('livingCode', True)
+					self.addReaction(SMSMessage, self.getFrequentEmoji('accepted'))
 					return True
 				else:
+					self.addReaction(SMSMessage, self.getFrequentEmoji('denied'))
 					self.safelock()
 					self.alert("Safelocking the bot after an incorrect SMS Key attempt.", True)
 					return False
@@ -100,7 +104,7 @@ class FeynbotClass(discord.Client):
 				self.alert(f"Safelocking the bot after a timeout of {self.prefix}unlock.", True)
 				self.safelock()
 		except asyncio.TimeoutError as error:
-			self.log("Safelocking the bot after a startup cooldown.", True)
+			self.log("Safelocking the bot after a startup cooldown.", False)
 			self.safelock()
 
 	######################
@@ -320,7 +324,7 @@ class FeynbotClass(discord.Client):
 	def sendMessage(self, channel, *args, **kwargs):
 		return self.addTask(channel.send(*args, **kwargs))
 
-	def replyMessage(self, message, *args, **kwargs):
+	def replyToMessage(self, message, *args, **kwargs):
 		return self.addTask(message.channel.send(*args, **kwargs))
 
 	def DMUser(self, user, *args, **kwargs):
@@ -333,7 +337,7 @@ class FeynbotClass(discord.Client):
 			return self.addTask(helper())
 		
 	def DMUserFromMessage(self, message, *args, **kwargs):
-		return DMUser(self, message.author, *args, **kwargs)
+		return self.DMUser(message.author, *args, **kwargs)
 
 	def editMessage(self, message, *args, concurrently = False, **kwargs):
 		return self.addTask(message.edit(*args, **kwargs))

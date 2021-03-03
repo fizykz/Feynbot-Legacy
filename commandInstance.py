@@ -119,6 +119,12 @@ class Class:
 			self.notifyError()
 			raise error
 
+	def notifyAccepted(self):
+		pass 
+
+	def notifyDenied(self):
+		pass
+
 	def notifyError(self):
 		self.bot.addTask(self.message.add_reaction(self.bot.getFrequentEmoji('reportMe')))	
 		self.bot.alert("An error was raised when executing " + self.commandIdentifier, True)	#Print the error and reject it.
