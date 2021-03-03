@@ -7,8 +7,8 @@
 #}
 #
 
-async def command(bot, message, guildData=None):
-	bot.log("Hey this worked!")
+async def command(cmd):
+	cmd.log("Hey this worked!")
 
 info = {
 	'arguments': [],

@@ -1,21 +1,21 @@
-#def command(bot, message, taskQueue, guildData=None):
-#	return #whatever
-#
-#help = {
-#	'arguments': [],	
-#	'summary': ""
-#}
-#
-
-async def command(bot, message, guildData=None):
-	if (bot.isAdmin(message.author.id)):
-		bot.runConcurrently(message.add_reaction(bot.getFrequentEmoji('accepted')))
-		user = bot.stringifyUser(message.author)
-		bot.log(f"Restart ordered by {user}.", True, True)
-		await bot.restart()
+async def command(cmd):
+	if (cmd.isModerator()):
+		cmd.notifySuccess()
+		boolean = cmd.evaluateBoolean(0)
+		if (boolean == None):
+			boolean = not cmd.bot.getSetting('overrideDiagnostics')
+		if (boolean):
+			cmd.log(f"Enabling diagnostic overrides; requested by {cmd.getFullUsername()}.", False, True)
+			cmd.reply("Enabling diagnostic overrides.")
+		else:
+			cmd.log(f"Disabling diagnostic overrides; requested by {cmd.getFullUsername()}.", False, True)
+			cmd.reply("Disabling diagnostic overrides.")
+		cmd.bot.setSetting('overrideDiagnostics', boolean)
+		
 
 info = {
+	'name': "Diagnostics",
 	'arguments': [],
-	'summary': "Restarts the bot.",
+	'summary': "Enables diagnostic overrides for the bot.",
 	'hidden': True
 }

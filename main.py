@@ -7,6 +7,8 @@ import subprocess
 import sys
 import warnings
 import inspect
+import math
+import datetime
 
 import pymongo
 import discord
@@ -64,6 +66,8 @@ class FeynbotClass(discord.Client):
 		self.reloadEvents()
 		for name, emojiID in config['emojis'].items():
 			self.frequentEmojis[name] = self.get_emoji(emojiID)
+		if (self.getSetting('livingCode')):
+			return
 		try:
 			unlockMessage = await self.wait_for('message', check=unlockCheck, timeout=300)
 			self.addReaction(unlockMessage, self.getFrequentEmoji('accepted'))
@@ -137,7 +141,7 @@ class FeynbotClass(discord.Client):
 					importlib.reload(self.events[eventName])	#Reload module just in case
 					self.handleEvent(eventName)
 				except SyntaxError as error:
-					self.alert(eventName + ".py errored: " + str(error), True, SyntaxWarning)	#Warn us about import errors.
+					self.alert(eventName + ".py errored: " + str(error), True)	#Warn us about import errors.
 		for eventName, module in self.events.items():				#Go over current events, see if any were removed
 			if (not (eventName + '.py') in os.listdir('./Events')):	# Check if it's still in the directory
 				self.events[eventName] = None 	#Remove module.
@@ -158,7 +162,7 @@ class FeynbotClass(discord.Client):
 								importlib.reload(self.eventOverrides[ID][eventName])	#Reload in case it was prior.
 								self.handleEvent(eventName)
 							except SyntaxError as error: 
-								self.alert(eventName + ".py errored: " + str(error), True, SyntaxWarning)	#Warn if an error was thrown.
+								self.alert(eventName + ".py errored: " + str(error), True)	#Warn if an error was thrown.
 			for ID, folder in self.eventOverrides.items():	#Go over current override collections, see if any were removed
 				for eventName in tuple(folder.keys()):	#Go over events in the collections.
 					if (eventName != '__directory'):	#Make sure we're not iterating over the metadata
@@ -208,7 +212,7 @@ class FeynbotClass(discord.Client):
 								self.alert(commandName + ".py errored trying to impliment alias \"" + alias + "\" but it was already taken by " + self.commands[alias].__name__ + ".py", True, True)
 				except SyntaxError as error:
 					self.commands[commandName] = error 
-					self.alert(commandName + ".py errored: " + str(error), True, SyntaxError)
+					self.alert(commandName + ".py errored: " + str(error), True)
 
 		if (overrides):
 			for ID in tuple(self.commandOverrides.keys()):				#Go over current commands, see if any were removed
@@ -241,7 +245,7 @@ class FeynbotClass(discord.Client):
 											self.alert(commandName + ".py errored trying to impliment alias \"" + alias + "\" but it was already taken by " + self.commandOverrides[ID][alias].__name__ + ".py", True, True)
 							except SyntaxError as error:
 								self.commands[commandName] = error
-								self.alert(commandName + ".py errored: " + str(error), True, SyntaxError)
+								self.alert(commandName + ".py errored: " + str(error), True)
 
 
 		self.log('Commands reloaded.', True, True)
@@ -348,7 +352,7 @@ class FeynbotClass(discord.Client):
 	def removeReaction(self, message, reaction, concurrently = False, member = None):
 		if (not member):
 			member = self.user
-		return addTask(message.remove_reaction(reaction, member))
+		return self.addTask(message.remove_reaction(reaction, member))
 
 	def getFrequentEmoji(self, name):
 		if (name in self.frequentEmojis):
@@ -370,11 +374,8 @@ class FeynbotClass(discord.Client):
 			if sendToDiagnostics or self.settings['overrideDiagnostics']:
 				return #Send to channel
 
-	def alert(self, message, sendToDiagnostics=False, raiseError=False):
-		if (raiseError):
-			raise RuntimeError(message)
-		else:
-			print("ALERT: \t" + str(message))
+	def alert(self, message, sendToDiagnostics=False):
+		print("ALERT: \t" + str(message))
 		if sendToDiagnostics or self.settings['overrideDiagnostics']:
 			#send to major or minor depending on the argument 
 			return #Send to channel
@@ -383,7 +384,22 @@ class FeynbotClass(discord.Client):
 		return self.addReaction(message, self.getFrequentEmoji('reportMe'))
 
 	async def restart(self, endDelay=0, startDelay=0):
-		await asyncio.sleep(endDelay)
+		start = datetime.datetime.now()
+		def cancelCheck(message):	#Function to check for a cancel command.
+			if (self.isAdmin(message.author.id)):
+				end = datetime.datetime.now()
+				if ((end - start) / datetime.timedelta(seconds=1) < endDelay - 5):
+					cmd = commandInstance.Class(self, message)
+					if (cmd.commandIdentifier == 'cancel'):
+						return True
+
+		try:
+			message = await self.wait_for('message', check = cancelCheck, timeout = numpy.clip(endDelay - 1, 0, endDelay))
+			self.addReaction(message, self.getFrequentEmoji('accepted'))
+			return message.author
+		except:
+			pass
+
 		try:
 			await self.close()
 		except:
@@ -393,6 +409,22 @@ class FeynbotClass(discord.Client):
 		subprocess.call([sys.executable, "main.py"])
 
 	async def end(self, endDelay=0):
+		start = datetime.datetime.now()
+		def cancelCheck(message):	#Function to check for a cancel command.
+			if (self.isAdmin(message.author.id)):
+				end = datetime.datetime.now()
+				if ((end - start) / datetime.timedelta(seconds=1) < endDelay - 5):
+					cmd = commandInstance.Class(self, message)
+					if (cmd.commandIdentifier == 'cancel'):
+						return True
+
+		try:
+			message = await self.wait_for('message', check = cancelCheck, timeout = endDelay)
+			self.addReaction(message, self.getFrequentEmoji('accepted'))
+			return message.author
+		except:
+			pass
+
 		await asyncio.sleep(endDelay)
 		try:
 			await self.close()

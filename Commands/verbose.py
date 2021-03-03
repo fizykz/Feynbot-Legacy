@@ -1,21 +1,22 @@
-#def command(bot, message, taskQueue, guildData=None):
-#	return #whatever
-#
-#help = {
-#	'arguments': [],	
-#	'summary': ""
-#}
-#
-
-async def command(bot, message, guildData=None):
-	if (bot.isAdmin(message.author.id)):
-		bot.runConcurrently(message.add_reaction(bot.getFrequentEmoji('accepted')))
-		user = bot.stringifyUser(message.author)
-		bot.log(f"Restart ordered by {user}.", True, True)
-		await bot.restart()
+async def command(cmd):
+	if (cmd.isModerator()):
+		cmd.notifySuccess()
+		boolean = cmd.evaluateBoolean(0)
+		if (boolean == None):
+			boolean = not cmd.bot.getSetting('verboseMessaging')
+		if (boolean):
+			cmd.log(f"Enabling verbose overrides; requested by {cmd.getFullUsername()}.", False, True)
+			cmd.reply("Enabling verbose overrides.")
+		else:
+			cmd.log(f"Disabling verbose overrides; requested by {cmd.getFullUsername()}.", False, True)
+			cmd.reply("Disabling verbose overrides.")
+		cmd.bot.setSetting('verboseMessaging', boolean)
+		
 
 info = {
+	'name': "Verbose Override",
 	'arguments': [],
-	'summary': "Enables admin access.",
+	'summary': "Enables verbose overrides for the bot.",
 	'hidden': True
 }
+

@@ -8,10 +8,10 @@
 #
 import datetime
 
-async def command(bot, message, guildData=None):
-	if (bot.isAdmin(message.author.id)):
-		ourMessage = await message.channel.send(message.content) 
-		bot.log(message.content, False, False)
+async def command(cmd):
+	if (cmd.isModerator()):
+		cmd.reply(cmd.content)
+		cmd.log(cmd.content, False, True)
 
 info = {
 	'name': "Debug",

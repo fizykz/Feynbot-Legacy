@@ -16,4 +16,7 @@ async def event(bot, message):
 	commandInstance = bot.commandInstance(bot, message)
 	if (commandInstance.isValid()):
 		bot.log("Found command: \'" + commandInstance.commandName + "\'")
-		return await commandInstance.tryRunning()
+		try: 
+			return await commandInstance()
+		except Exception as error:
+			commandInstance.notifyError(error)

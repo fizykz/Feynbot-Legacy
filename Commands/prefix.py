@@ -1,8 +1,8 @@
-
 def command(bot, message):
-	return #test
+	pass
 
 info = {
+	'name': "Prefix",
 	'arguments': [],
 	'summary': "Demonstrates or changes the guild's prefix."
 }

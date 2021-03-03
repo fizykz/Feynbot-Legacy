@@ -73,6 +73,24 @@ def substringIfStartsWith(string, substring):
 		return string[len(substring):]
 	return None
 
+def isPlural(number):
+	if (number == 1):
+		return ''
+	return 's'
+
+def isVerbPlural(number):
+	if (number == 1):
+		return 's'
+	return ''
+
+def isRedundant(string, number, *args):
+	if (number == 0):
+		return ''
+	return string.format(*args)
+
+def parseString(string):
+	return re.findall(r'\s?(\S+)\s?', string, flags = re.S) 
+
 def formatPhoneNumber(number):
 	assert (int(number) == number and 0 <= number <= 9999999999), "Should be an integer between 0 and 9999999999."
 	number = str(number) 
