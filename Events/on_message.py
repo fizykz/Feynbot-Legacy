@@ -6,7 +6,7 @@ def process(bot, message):
 
 
 async def event(bot, message):
-	print("String representation:", repr(message.content))
+	bot.log("String representation:", repr(message.content))
 	if (message.author.id == bot.user.id): #NEVER EVER respond to ourselves.  Huge security risk.
 		return
 	
@@ -14,7 +14,6 @@ async def event(bot, message):
 		return
 
 	commandInstance = bot.commandInstance(bot, message)
-	print(bot.commandInstance)
 	if (commandInstance.isValid()):
 		bot.log("Found command: \'" + commandInstance.commandName + "\'")
 		return await commandInstance.tryRunning()
