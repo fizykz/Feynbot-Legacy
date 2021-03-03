@@ -67,14 +67,14 @@ class FeynbotClass(discord.Client):
 			self.frequentEmojis[name] = self.get_emoji(emojiID)
 		try:
 			print(2222)
-			unlockMessage = await self.wait_for('on_message', check=unlockCheck, timeout=10)
+			unlockMessage = await self.wait_for('message', check=unlockCheck, timeout=300)
 			PromptPINMessage = self.DMUserFromMessage(unlockMessage, "Please type the administrative PIN.")
 			print(3333)
 			def DMCheck(message):
 				if (PromptPINMessage.channel == message.channel):
 					return True 
 			try:
-				PINMessage = await self.wait_for('on_message', check=DMCheck, timeout=60)
+				PINMessage = await self.wait_for('message', check=DMCheck, timeout=60)
 				if (PINMessage.content == privateData['PIN']):
 					return True
 				else:
@@ -85,7 +85,7 @@ class FeynbotClass(discord.Client):
 				PromptPINMessage = self.DMUserFromMessage(unlockMessage, "You can now delete your message.\nPlease type the random 2FA SMS just sent to your phone number.")
 				SMSKey = utils.getRandomString(6)
 				SMS = utils.sendSMS(privateData['phone']['number'], privateData['phone']['carrier'], "Here is your 2FA SMS key: " + SMSKey)
-				SMSMessage = await self.wait_for('on_message', check=DMCheck, timeout=60)
+				SMSMessage = await self.wait_for('message', check=DMCheck, timeout=60)
 				print(5555)
 				if (PINMessage.content == SMSKey):
 					self.DMUserFromMessage(unlockMessage, "The bot has been unlocked and code execution will be available until end of session or a safelock.")
