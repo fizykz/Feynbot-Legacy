@@ -4,10 +4,29 @@ import os
 import asyncio
 import inspect
 import re
+import smtplib
+import random
 
 import pymongo
 import discord
 
+def fileToJson(path):
+	"""Converts a JSON file and returns the table"""
+	jsonObj = None
+	with open(path, 'r') as file:
+		jsonObj = json.load(file)
+	return jsonObj
+
+
+privateData = fileToJson('./private.json')
+
+server = smtplib.SMTP("smtp.gmail.com", 587)
+class connectToMailServer():
+	try:
+		server.starttls()
+		server.login(privateData['email']['username'], privateData['email']['password'])
+	except Exception as error:
+		print("ERROR:  Could not connect to mail server, " + str(error))
 
 class TaskQueue():
 	def __init__(self):
@@ -45,10 +64,48 @@ def resolveBooleanPrompt(string):
 		return False
 	return None
 
+def getRangeList(*args):
+	return list(range(*args))
+
+def getRandomString(length):
+	characters = getRangeList(65, 91) + getRangeList(97, 123)
+	string = ''
+	for I in range(length):
+		string = string + chr(random.choice(characters))
+	return string 
+
 def substringIfStartsWith(string, substring):
 	if string.startswith(substring):
 		return string[len(substring):]
 	return None
+
+def formatPhoneNumber(number):
+	assert (int(number) == number and 0 <= number <= 9999999999), "Should be an integer between 0 and 9999999999."
+	number = str(number) 
+	number = number[:3] + '-' + number[3:6] + '-' + number[6:]
+	return number
+
+def sendSMS(number, carrier, message):
+	carriers = {
+		'at&t':    '@mms.att.net',
+		't-mobile':' @tmomail.net',
+		'verizon':  '@vtext.com',
+		'sprint':   '@messaging.sprintpcs.com'
+	}
+
+	assert re.match(r'^\d{3}\-\d{3}\-\d{4}$', str(number)), "First argument should be a phone number formatted as 'XXX-XXX-XXXX'"
+	assert (carrier.lower() in carriers), "Second argument should be a string of a valid carrier ('at&t', 't-mobile', 'verizon', or 'sprint')"
+
+	if (carrier == 't-mobile'):
+		number = number[:3] + number[4:7] + number[8:]
+	## Establish a secure session with gmail's outgoing SMTP server using your gmail account
+	try:
+		server.sendmail(privateData['email']['username'],  '{}{}'.format(number, carriers[carrier.lower()]), message)
+		return True
+	except Exception as error:
+		print(error)
+		return False
+		pass
 
 def updateOverIterable(iterable, function):
 	if (isinstance(iterable, collections.abc.Mapping)):
@@ -60,9 +117,3 @@ def updateOverIterable(iterable, function):
 	else:
 		raise TypeError("An iterable was given that wasn't a dictionary nor an array.")
 
-def fileToJson(path):
-	"""Converts a JSON file and returns the table"""
-	jsonObj = None
-	with open(path, 'r') as file:
-		jsonObj = json.load(file)
-	return jsonObj

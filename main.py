@@ -48,24 +48,59 @@ class FeynbotClass(discord.Client):
 			'bannedUsers': [],
 		}
 		self.settings = config['defaultSettings']
+		#"verboseMessaging": false, 
+		#"overrideDiagnostics" : false,
+		#"livingCode": false,
+		#"safelock": false
 
 	async def on_ready(self): #Bot ready to make API commands and is recieving events.
-		def checkFunction(message):
-			content = message.content 
+		def unlockCheck(message):	#Function to check for an unlock command.
+			print(1111)
 			if (self.isOwner(message.author.id)):
 				cmd = commandInstance.Class(self, message)
 				if (cmd.commandIdentifier == 'unlock'):
 					return True
-
 		self.log("Logged on and ready.", False, True)
 		self.reloadCommands()
 		self.reloadEvents()
 		for name, emojiID in config['emojis'].items():
 			self.frequentEmojis[name] = self.get_emoji(emojiID)
 		try:
-			await self.wait_for('on_message', check=checkFunction, timeout=5)
+			print(2222)
+			unlockMessage = await self.wait_for('on_message', check=unlockCheck, timeout=10)
+			PromptPINMessage = self.DMUserFromMessage(unlockMessage, "Please type the administrative PIN.")
+			print(3333)
+			def DMCheck(message):
+				if (PromptPINMessage.channel == message.channel):
+					return True 
+			try:
+				PINMessage = await self.wait_for('on_message', check=DMCheck, timeout=60)
+				if (PINMessage.content == privateData['PIN']):
+					return True
+				else:
+					self.safelock()
+					self.alert("Safelocking the bot after an incorrect PIN attempt.", True)
+					return False
+				print(4444)
+				PromptPINMessage = self.DMUserFromMessage(unlockMessage, "You can now delete your message.\nPlease type the random 2FA SMS just sent to your phone number.")
+				SMSKey = utils.getRandomString(6)
+				SMS = utils.sendSMS(privateData['phone']['number'], privateData['phone']['carrier'], "Here is your 2FA SMS key: " + SMSKey)
+				SMSMessage = await self.wait_for('on_message', check=DMCheck, timeout=60)
+				print(5555)
+				if (PINMessage.content == SMSKey):
+					self.DMUserFromMessage(unlockMessage, "The bot has been unlocked and code execution will be available until end of session or a safelock.")
+					self.alert("The bot has been unlocked and code execution will be available until end of session or a safelock.", True)
+					self.setSetting('livingCode', True)
+					return True
+				else:
+					self.safelock()
+					self.alert("Safelocking the bot after an incorrect SMS Key attempt.", True)
+					return False
+			except asyncio.TimeoutError as error:
+				self.alert(f"Safelocking the bot after a timeout of {self.prefix}unlock.", True)
+				self.safelock()
 		except asyncio.TimeoutError as error:
-			self.log("Safelocking the bot.", True)
+			self.log("Safelocking the bot after a startup cooldown.", True)
 			self.safelock()
 
 	######################
@@ -126,7 +161,7 @@ class FeynbotClass(discord.Client):
 						if (not (eventName + '.py') in os.listdir(folder['__directory'])):
 							del folder[eventName]	#Delete any override we don't have anymore
 
-		self.log('Events reloaded.', False, True)
+		self.log('Events reloaded.', True, True)
 		return #Iterate over folders, find modules, import.
 
 	def getEvent(self, event, IDs, returnModule = False):
@@ -205,17 +240,17 @@ class FeynbotClass(discord.Client):
 								self.alert(commandName + ".py errored: " + str(error), True, SyntaxError)
 
 
-		self.log('Commands reloaded.', False, True)
+		self.log('Commands reloaded.', True, True)
 		return #Iterate over folders, find modules, import.
 
-	def getCommand(self, command, channelID = None, guildID = None, returnModule = False):
+	def getCommand(self, commandIdentifier, channelID = None, guildID = None, returnModule = False):
 		module = None
-		if (channelID and channelID in self.commandOverrides and command in self.commandOverrides[channelID]):
-			module = self.commandOverrides[message.channel.id][command]
-		elif (guildID and guildID in self.commandOverrides and command in self.commandOverrides[guildID]):
-			module = self.commandOverrides[guildID][command]
-		elif (command in self.commands):
-			module = self.commands[command]
+		if (channelID and channelID in self.commandOverrides and commandIdentifier in self.commandOverrides[channelID]):
+			module = self.commandOverrides[channelID][commandIdentifier]
+		elif (guildID and guildID in self.commandOverrides and commandIdentifier in self.commandOverrides[guildID]):
+			module = self.commandOverrides[guildID][commandIdentifier]
+		elif (commandIdentifier in self.commands):
+			module = self.commands[commandIdentifier]
 
 		if (returnModule):	
 			return module
@@ -226,9 +261,11 @@ class FeynbotClass(discord.Client):
 	### Utilities ###
 	#################
 	def reloadLibraries(self):
+		self.log('Reloading libraries...', True, True)		
 		self.commandInstance = importlib.reload(commandInstance).Class
 		self.utils = importlib.reload(utils)
-		dbUtils = importlib.reload(dbUtils)
+		importlib.reload(dbUtils)
+		self.log('Reloaded libraries.', True, True)		
 
 	def getSetting(self, setting):
 		if (setting in self.settings):
@@ -246,7 +283,7 @@ class FeynbotClass(discord.Client):
 		return self.__class__
 
 	def isOwner(self, ID, canBeSelf = False):
-		return ID in self.state['owner'] and (ID != self.user.id or canBeSelf)
+		return ID in self.state['owners'] and (ID != self.user.id or canBeSelf)
 
 	def isAdmin(self, ID, canBeSelf = False):
 		return ID in self.state['admins'] or self.isOwner(ID, canBeSelf)
@@ -280,8 +317,23 @@ class FeynbotClass(discord.Client):
 	def safelock(self):
 		self.settings['safelock'] = False
 
-	def sendMessage(self, channel, *args, concurrently = False, **kwargs):
+	def sendMessage(self, channel, *args, **kwargs):
 		return self.addTask(channel.send(*args, **kwargs))
+
+	def replyMessage(self, message, *args, **kwargs):
+		return self.addTask(message.channel.send(*args, **kwargs))
+
+	def DMUser(self, user, *args, **kwargs):
+		channel = user.dm_channel
+		if (channel):
+			return self.addTask(channel.send(*args, **kwargs))
+		else:
+			async def helper():
+				return await (await user.create_dm()).send(*args, **kwargs)
+			return self.addTask(helper())
+		
+	def DMUserFromMessage(self, message, *args, **kwargs):
+		return DMUser(self, message.author, *args, **kwargs)
 
 	def editMessage(self, message, *args, concurrently = False, **kwargs):
 		return self.addTask(message.edit(*args, **kwargs))
