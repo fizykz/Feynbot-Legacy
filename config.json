@@ -2,9 +2,9 @@
 	"defaultPrefix": ">",
 
 	"defaultSettings": {
-		"verboseMessaging": true, 
-		"overrideDiagnostics" : true,
-		"livingCode": true,
+		"verboseMessaging": false, 
+		"overrideDiagnostics" : false,
+		"livingCode": false,
 		"safelock": false
 	},
 
