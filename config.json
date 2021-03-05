@@ -1,10 +1,10 @@
 {
-	"defaultPrefix": ">",
-
 	"defaultSettings": {
+		"defaultPrefix": ">",
+		"unlockDuration": [300, 60],
 		"verboseMessaging": false, 
 		"overrideDiagnostics" : false,
-		"livingCode": true,
+		"livingCode": false,
 		"safelock": false
 	},
 
@@ -39,7 +39,7 @@
 		"reportMe": 815936904779399188
 	},
 
-	"levels": {
+	"permissionLevels": {
 		"owner": 5,
 		"admin": 4,
 		"moderator": 3,

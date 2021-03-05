@@ -486,4 +486,5 @@ client = None
 if (__name__ == '__main__'):
 	client = FeynbotClass()
 	client.run(privateData['token'])
-
+else:
+	pass

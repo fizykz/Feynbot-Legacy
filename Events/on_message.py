@@ -13,10 +13,10 @@ async def event(bot, message):
 	if (message.author.bot): #Don't respond to other bots, (or potentially some)
 		return
 
-	commandInstance = bot.commandInstance(bot, message)
-	if (commandInstance.isValid()):
-		bot.log("Found command: \'" + commandInstance.commandName + "\'")
+	commandInterface = bot.commandInterface(bot, message)
+	if (commandInterface.isValidCommand()):
+		bot.log("Found command: \'" + commandInterface.commandName + "\'")
 		try: 
-			return await commandInstance()
+			return await commandInterface()
 		except Exception as error:
-			commandInstance.notifyError(error)
+			commandInterface.notifyError(error)

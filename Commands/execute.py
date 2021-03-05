@@ -26,7 +26,7 @@ async def command(cmd):
 
 	if (cmd.isOwner()):	#Make sure the messenger is the owner.
 		if not (not cmd.bot.getSetting('safelock') and cmd.bot.getSetting('livingCode')):	#Make sure we're allowing code to run.
-			cmd.bot.safelock()	#If we aren't safelock the bot because WE should be knowing better.
+			cmd.bot.safelock()	#If we aren't safelock the bot because WE should be knowing better.	#TODO: needs an alert to mark someone tried to run.
 			cmd.notifyFailure()
 			cmd.reply("Executing code has been disabled.")
 			return 

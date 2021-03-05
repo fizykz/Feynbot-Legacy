@@ -175,7 +175,8 @@ GitHub.sublime-settings
 
 # End of https://www.toptal.com/developers/gitignore/api/python,sublimetext
 
+#Represents all data that needs to be kept secret.  Secret keys, passwords, phone numbers, etc.
+private.json 
 
-private.json
 toDo.txt
 .gitattributes

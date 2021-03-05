@@ -2,26 +2,32 @@ import re
 import inspect
 
 import utils
+import lang
 
-class Class:
-	def __init__(self, bot, message):
-		self.bot = bot
+class CommandInterface:
+	def __init__(self, program, message):
+		self.program = program
+		self.bot = program.bot 
+		bot = program.bot 
+
+		self.valid = None
+		self.error = None
+
 		self.message = message
 		self.guild = message.guild or None
 		self.guildData = None
 		self.channel = message.channel
-		self.parsedString = utils.parseString(message.content)
+		self.parsedString = message.content.split()
 		self.commandIdentifier = self.__prepareCommand__(message.content)
-		self.valid = None
-		self.error = None
-		self.utils = bot.utils
+		
+		self.utils = utils
 		self.content = message.content
+		self.lang = lang
 
 		if (self.commandIdentifier):	#Check if this is a command as soon as we can to save memory/computation.
 			self.commandModule = bot.getCommand(self.commandIdentifier, self.channel.id, self.guild and self.guild.id, True)
 
 			if (self.commandModule): #Only keep going if it's a command with a valid module.
-
 				self.valid = True
 				if (type(self.commandModule) != SyntaxError):	#Make sure this command module didn't error.
 					try:
@@ -87,20 +93,18 @@ class Class:
 				else:
 					return None #no identifier found.
 
-	def isValid(self): #True if fine, False if error, None if nothing,
+	def isValidCommand(self): #True if fine, False if error, None if nothing,
 		return self.valid and not self.error
 
 	def getArgumentLength(self):
 		return len(self.parsedArguments)
-
-	def reply(self, *args, **kwargs):
-		return self.bot.replyToMessage(self.message, *args, **kwargs)
 
 	def addTask(self, *args, **kwargs):
 		return self.bot.addTask(*args, **kwargs)
 
 	def sleep(self, *args, **kwargs):
 		return self.bot.sleep(*args, **kwargs)
+
 
 	def delayEdit(self, message, delay, *args, **kwargs):
 		async def helper():
@@ -110,6 +114,32 @@ class Class:
 
 	def edit(self, message, *args, **kwargs):
 		self.addTask(message.edit(*args, **kwargs))
+
+
+	def reply(self, *args, **kwargs):
+		return self.bot.replyToMessage(self.message, *args, **kwargs)
+
+	def notifySuccess(self):
+		return self.bot.addReaction(self.message, self.bot.getFrequentEmoji('accepted'))
+
+	def notifyFailure(self):
+		return self.bot.addReaction(self.message, self.bot.getFrequentEmoji('denied'))
+
+	def promptRepeat(self):
+		return self.bot.addReaction(self.message, self.bot.getFrequentEmoji('repeat'))
+
+
+	def notifyError(self, error):
+		self.bot.addReaction(self.message, self.bot.getFrequentEmoji('reportMe'))	
+		self.alert("An error was raised when executing " + self.commandIdentifier + ".py:\n" + str(error), True)	#Print the error and reject it.
+
+
+	def log(self, *args, **kwargs):
+		self.bot.log(*args, **kwargs)
+
+	def alert(self, *args, **kwargs):
+		self.bot.alert(*args, **kwargs)
+
 
 	def evaluateBoolean(self, position):
 		if (position < self.getArgumentLength()):
@@ -125,6 +155,7 @@ class Class:
 		if (position < self.getArgumentLength()):
 			return num(self.parsedArguments[position])
 		return None
+
 
 	def getFullUsername(self, withID = True):
 		return self.bot.stringifyUser(self.user, withID)
@@ -144,6 +175,16 @@ class Class:
 	def isBanned(self):
 		return self.permissionLevel >= self.bot.state['levels']['banned']
 
+	def getUserData(self):
+		if (self.user and self.userData):
+			return self.userData 
+		if (self.user):
+			data = self.bot.getUserData(self.user.id)
+			self.userData = data 
+			return data 
+		return None
+
+
 	def getGuildData(self):
 		if (self.guild and self.guildData):
 			return self.guildData 
@@ -153,13 +194,6 @@ class Class:
 			return data 
 		return None 
 
-	def getUserData(self):
-		if (self.guild and self.guildData):
-			return self.guildData 
-		if (self.guild):
-			data = self.bot.getGuildData(self.guild.id)
-			self.guildData = data 
-			return data 
 
 	def runCommand(self):
 		try:
@@ -172,22 +206,7 @@ class Class:
 	def __call__(self, *args):
 		return self.runCommand()
 
-	def notifySuccess(self):
-		return self.bot.addReaction(self.message, self.bot.getFrequentEmoji('accepted'))
 
-	def notifyFailure(self):
-		return self.bot.addReaction(self.message, self.bot.getFrequentEmoji('denied'))
 
-	def promptRepeat(self):
-		return self.bot.addReaction(self.message, self.bot.getFrequentEmoji('repeat'))
-
-	def log(self, *args, **kwargs):
-		self.bot.log(*args, **kwargs)
-
-	def alert(self, *args, **kwargs):
-		self.bot.alert(*args, **kwargs)
-
-	def notifyError(self, error):
-		self.bot.addReaction(self.message, self.bot.getFrequentEmoji('reportMe'))	
-		self.alert("An error was raised when executing " + self.commandIdentifier + ".py:\n" + str(error), True)	#Print the error and reject it.
+	
 		
