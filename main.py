@@ -18,10 +18,9 @@ import argparse
 from utils import fileToJson
 from attrdict import AttrDict as AttributeDictionary
 
-data = {
-	'packageInfo': fileToJson('./packageInfo.json'),
-	'private': fileToJson('./private.json'),
-}
+data = fileToJson('./config.json')
+data['private'] = fileToJson('./private.json')
+data['packageInfo'] = fileToJson('./packageInfo.json')
 
 #Todo:  All of these as full features:  
 parser = argparse.ArgumentParser(description = "A Python Discord bot with a powerful and modular architecture.")
