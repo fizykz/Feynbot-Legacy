@@ -18,7 +18,12 @@ import argparse
 from utils import fileToJson
 from attrdict import AttrDict as AttributeDictionary
 
-packageInfo = fileToJson('./packageInfo.json')	#Todo:  All of these:  
+data = {
+	'packageInfo': fileToJson('./packageInfo.json'),
+	'private': fileToJson('./private.json'),
+}
+
+#Todo:  All of these as full features:  
 parser = argparse.ArgumentParser(description = "A Python Discord bot with a powerful and modular architecture.")
 parser.add_argument('--resetSafelock', '-s', dest = 'resetSafeLock', action = 'store_true', help = "Resets a safelock if it was in place.")
 parser.add_argument('--livingCode', '-l', dest = 'livingCode', action = 'store_true', help = "Alllows the livingCode to be enabled.  Still needs to be unlocked before the safelock duration to be used the full session.")
@@ -26,7 +31,7 @@ parser.add_argument('--livingCodeSession', dest = 'livingCodeSession', action = 
 parser.add_argument('--noPrinting', '-p', dest = 'noPrinting', action='store_true', help="Turns off printing for the bot.")
 parser.add_argument('--verbose', '-v', dest = 'verbose', action = 'count', default = 0, help = "Prints more content when running the program, -vvv is more verbose than -v.")
 parser.add_argument('--overrideDiagnostics', '-d', dest = 'overrideDiagnostics', action = 'store_true', default = 0, help = "Sends all logged messages to diagnostics.") 
-parser.add_argument('--version', '-ver', action = 'version', version = packageInfo, help = "Prints more content when running the program, -vvv is more verbose than -v.")
+parser.add_argument('--version', '-ver', action = 'version', version = data['packageInfo']['VERSION'], help = "Prints more content when running the program, -vvv is more verbose than -v.")
 CLIArguments = parser.parse_args()
 
 #Build-in Libraries (Excluding argparse)
@@ -42,7 +47,7 @@ import inspect
 import math
 import datetime
 
-#Third party libraries (Excluding attrdict)
+#Third party libraries
 import pymongo
 import discord
 
@@ -50,8 +55,10 @@ import discord
 import utils
 import dbUtils
 import commandInterface
-import lang
+import languageModule
 import errors
+
+
 
 class Feynbot(discord.Client):
 	def __init__(self):
@@ -74,7 +81,7 @@ class Feynbot(discord.Client):
 
 
 	async def on_ready(self): #Bot ready to make API commands and is recieving events.
-		lang = self.program.lang.getContent('english', 'onReady')
+		lang = self.program.languageModule.getContent('english', 'onReady')
 		def unlockCheck(message):	#Function to check for an unlock command.
 			if (self.isOwner(message.author.id)):
 				cmd = commandInterface.CommandInterface(self, message)
@@ -420,7 +427,7 @@ class Feynbot(discord.Client):
 
 client = None
 if (__name__ == '__main__'):
-	client = FeynbotClass()
-	client.run(privateData['token'])
+	client = Feynbot()
+	client.run(data['private']['bot']['token'])
 else:
 	pass
