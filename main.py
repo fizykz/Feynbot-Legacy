@@ -1,3 +1,35 @@
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+
+#Lead program stuff.  argparse, etc. #TODO: lang.py replacements.
+import argparse
+from utils import fileToJson
+from attrdict import AttrDict as AttributeDictionary
+
+packageInfo = fileToJson('./packageInfo.json')	#Todo:  All of these:  
+parser = argparse.ArgumentParser(description = "A Python Discord bot with a powerful and modular architecture.")
+parser.add_argument('--resetSafelock', '-s', dest = 'resetSafeLock', action = 'store_true', help = "Resets a safelock if it was in place.")
+parser.add_argument('--livingCode', '-l', dest = 'livingCode', action = 'store_true', help = "Alllows the livingCode to be enabled.  Still needs to be unlocked before the safelock duration to be used the full session.")
+parser.add_argument('--livingCodeSession', dest = 'livingCodeSession', action = 'store_true', help = "Turns off the unlock duration, so the bot won't automatically safelock.  Only use if you know what you're doing.")
+parser.add_argument('--noPrinting', '-p', dest = 'noPrinting', action='store_true', help="Turns off printing for the bot.")
+parser.add_argument('--verbose', '-v', dest = 'verbose', action = 'count', default = 0, help = "Prints more content when running the program, -vvv is more verbose than -v.")
+parser.add_argument('--overrideDiagnostics', '-d', dest = 'overrideDiagnostics', action = 'store_true', default = 0, help = "Sends all logged messages to diagnostics.") 
+parser.add_argument('--version', '-ver', action = 'version', version = packageInfo, help = "Prints more content when running the program, -vvv is more verbose than -v.")
+CLIArguments = parser.parse_args()
+
+#Build-in Libraries (Excluding argparse)
 import numpy
 import asyncio
 import importlib
@@ -10,28 +42,29 @@ import inspect
 import math
 import datetime
 
+#Third party libraries (Excluding attrdict)
 import pymongo
 import discord
 
+#Self made libraries.  NOTE: These are only the staticly imported libraries.  Under './Commands', './Overrides', and more, are dynamically imported libraries which aren't listed here.
 import utils
 import dbUtils
-import commandInstance
+import commandInterface
+import lang
+import errors
 
-privateData = utils.fileToJson('./private.json')
-config = utils.fileToJson('./config.json')
-
-
-class FeynbotClass(discord.Client):
+class Feynbot(discord.Client):
 	def __init__(self):
 		super().__init__()
-		self.botClass = self.getClass()
 		self.utils = utils
 		self.addTask = asyncio.create_task
 		self.sleep = asyncio.sleep
 		self.runConcurrently = asyncio.gather
 
 		self.frequentEmojis = {
-			"repeat": '🔁'
+			'repeat': '🔁',
+			'defaultAccepted': '✅',
+			'defaultDenied': '❌',
 		}
 
 		self.commands = {}
@@ -39,39 +72,25 @@ class FeynbotClass(discord.Client):
 		self.events = {}
 		self.eventOverrides = {}
 
-		self.prefix = config['defaultPrefix']
-		self.commandInstance = commandInstance.Class
-		self.state = {
-			'levels': config['levels'],
-			'owners': config['owners'],
-			'admins': config['admins'],
-			'moderators': config['moderators'],
-			'channels': config['linkedChannels'],
-			'bannedUsers': [],
-		}
-		self.settings = config['defaultSettings']
-		#"verboseMessaging": false, 
-		#"overrideDiagnostics" : false,
-		#"livingCode": false,
-		#"safelock": false
 
 	async def on_ready(self): #Bot ready to make API commands and is recieving events.
+		lang = self.program.lang.getContent('english', 'onReady')
 		def unlockCheck(message):	#Function to check for an unlock command.
 			if (self.isOwner(message.author.id)):
-				cmd = commandInstance.Class(self, message)
+				cmd = commandInterface.CommandInterface(self, message)
 				if (cmd.commandIdentifier == 'unlock'):
 					return True
-		self.log("Logged on and ready.", False, True)
+		self.log(lang[0], False, True)	#"Logged on and ready"
 		self.reloadCommands()
 		self.reloadEvents()
 		for name, emojiID in config['emojis'].items():
 			self.frequentEmojis[name] = self.get_emoji(emojiID)
 		if (self.getSetting('livingCode')):
 			return
-		try:
+		try:	#TODO:  Try-Excepts need to except any other errors to safelock.
 			unlockMessage = await self.wait_for('message', check=unlockCheck, timeout=300)
 			self.addReaction(unlockMessage, self.getFrequentEmoji('accepted'))
-			PromptPINMessage = await self.DMUserFromMessage(unlockMessage, "Please type the administrative PIN.")
+			PromptPINMessage = await self.DMUserFromMessage(unlockMessage, lang[1])	#"Please type administrative PIN"
 			def DMCheck(message):
 				if (PromptPINMessage.channel == message.channel and message.author != self.user):
 					return True 
@@ -81,36 +100,35 @@ class FeynbotClass(discord.Client):
 				if (PINMessage.content != privateData['PIN']):
 					self.addReaction(PINMessage, self.getFrequentEmoji('denied'))
 					self.safelock()
-					self.alert("Safelocking the bot after an incorrect PIN attempt.", True)
+					self.alert(lang[2], True)	#"Safelocking the bot; incorrect PIN.""
 					return False
 				self.addReaction(PINMessage, self.getFrequentEmoji('accepted'))
-				PromptSMSMessage = await self.DMUserFromMessage(unlockMessage, "You can now delete your PIN from this channel.\nPlease type the random 2FA SMS just sent to your phone number.")
+				PromptSMSMessage = await self.DMUserFromMessage(unlockMessage, lang[3]) #"Please type sent SMS key"
 				SMSKey = utils.getRandomString(6)
-				SMS = utils.sendSMS(privateData['phone']['number'], privateData['phone']['carrier'], "Here is your 2FA SMS key: " + SMSKey)
+				SMS = utils.sendSMS(privateData['phone']['number'], privateData['phone']['carrier'], lang[4] + SMSKey) #"Here is SMS key"
 				if (not SMS):
-					self.replyToMessage(PromptSMSMessage, "An error occured while sending the SMS.")
-					self.alert(f"An error occured with an SMS while undergoing {self.prefix}unlock, the bot has safelocked as a precaution.", True)
+					self.replyToMessage(PromptSMSMessage, lang[5]) #"Error occured while sending SMS"
+					self.alert(lang[6].format(self.prefix), True)	#"Error occured while >unlocking"
 					self.safelock()
 					self.addReaction(PromptSMSMessage, self.getFrequentEmoji('denied'))
 				SMSMessage = await self.wait_for('message', check=DMCheck, timeout=60)
 				if (SMSMessage.content == SMSKey):
-					self.DMUserFromMessage(unlockMessage, "The bot has been unlocked and code execution will be available until end of session or a safelock.")
-					self.alert("The bot has been unlocked and code execution will be available until end of session or a safelock.", True)
+					self.DMUserFromMessage(unlockMessage, lang[6]) #"Bot has been unlocked for this session/until safelock."
+					self.alert(lang[6], True) #"Same ^^^"
 					self.setSetting('livingCode', True)
 					self.addReaction(SMSMessage, self.getFrequentEmoji('accepted'))
 					return True
 				else:
 					self.addReaction(SMSMessage, self.getFrequentEmoji('denied'))
 					self.safelock()
-					self.alert("Safelocking the bot after an incorrect SMS Key attempt.", True)
+					self.alert(lang[7].format(self.prefix), True)	#Incorrect SMS attempt, safelocking
 					return False
 			except asyncio.TimeoutError as error:
-				self.alert(f"Safelocking the bot after a timeout of {self.prefix}unlock.", True)
+				self.alert(lang[8], True)	#Safelocking after a timeout after >unlock
 				self.safelock()
 		except asyncio.TimeoutError as error:
-			self.log("Safelocking the bot after a startup cooldown.", False)
+			self.log(lang[9], False)	#Safelocking after inactivity.
 			self.safelock()
-
 	######################
 	### Event Handling ###
 	######################
@@ -268,25 +286,6 @@ class FeynbotClass(discord.Client):
 	#################
 	### Utilities ###
 	#################
-	def reloadLibraries(self):
-		self.log('Reloading libraries...', True, True)		
-		self.commandInstance = importlib.reload(commandInstance).Class
-		self.utils = importlib.reload(utils)
-		importlib.reload(dbUtils)
-		self.log('Reloaded libraries.', True, True)		
-
-	def getSetting(self, setting):
-		if (setting in self.settings):
-			return self.settings[setting]
-
-	def setSetting(self, setting, state):
-		if (setting == 'safelock'):
-			self.safelock()
-			self.clearAdmins()
-			self.alert("Safelock was attempted to be overridden!", True, True)
-		if (setting in self.settings):
-			self.settings[setting] = state
-
 	def getClass(self):	
 		return self.__class__
 
@@ -304,6 +303,7 @@ class FeynbotClass(discord.Client):
 
 	def addBanned(self, ID):
 		self.state['bannedUsers'].append(ID)
+		#TODO:  Add to datastore
 
 	def clearAdmins(ownersToo = True):
 		self.data['admins'] = []
@@ -365,72 +365,8 @@ class FeynbotClass(discord.Client):
 			return author.display_name + '#' + str(author.discriminator) + ' (' + str(author.id) + ')'
 		return author.display_name + '#' + str(author.discriminator)
 
-	def parseString(self, string):
-		return []
-
-	def log(self, message, verbose=True, sendToDiagnostics=False):
-		if (not (not self.settings['verboseMessaging'] and verbose)):   #Send all messages except verbose ones when verbose messaging is off.  Send_verbose nand Verbose
-			print(message)
-			if sendToDiagnostics or self.settings['overrideDiagnostics']:
-				return #Send to channel
-
-	def alert(self, message, sendToDiagnostics=False):
-		print("ALERT: \t" + str(message))
-		if sendToDiagnostics or self.settings['overrideDiagnostics']:
-			#send to major or minor depending on the argument 
-			return #Send to channel
-
 	def reactWithBug(self, message):
 		return self.addReaction(message, self.getFrequentEmoji('reportMe'))
-
-	async def restart(self, endDelay=0, startDelay=0):
-		start = datetime.datetime.now()
-		def cancelCheck(message):	#Function to check for a cancel command.
-			if (self.isAdmin(message.author.id)):
-				end = datetime.datetime.now()
-				if ((end - start) / datetime.timedelta(seconds=1) < endDelay - 5):
-					cmd = commandInstance.Class(self, message)
-					if (cmd.commandIdentifier == 'cancel'):
-						return True
-
-		try:
-			message = await self.wait_for('message', check = cancelCheck, timeout = numpy.clip(endDelay - 1, 0, endDelay))
-			self.addReaction(message, self.getFrequentEmoji('accepted'))
-			return message.author
-		except:
-			pass
-
-		try:
-			await self.close()
-		except:
-			pass
-		await self.logout()
-		await asyncio.sleep(startDelay)
-		subprocess.call([sys.executable, "main.py"])
-
-	async def end(self, endDelay=0):
-		start = datetime.datetime.now()
-		def cancelCheck(message):	#Function to check for a cancel command.
-			if (self.isAdmin(message.author.id)):
-				end = datetime.datetime.now()
-				if ((end - start) / datetime.timedelta(seconds=1) < endDelay - 5):
-					cmd = commandInstance.Class(self, message)
-					if (cmd.commandIdentifier == 'cancel'):
-						return True
-
-		try:
-			message = await self.wait_for('message', check = cancelCheck, timeout = endDelay)
-			self.addReaction(message, self.getFrequentEmoji('accepted'))
-			return message.author
-		except:
-			pass
-
-		await asyncio.sleep(endDelay)
-		try:
-			await self.close()
-		except:
-			pass
-		await self.logout()
 
 	################
 	### Database ###
@@ -460,7 +396,7 @@ class FeynbotClass(discord.Client):
 	def setupServer(self, guild):	#Should only be ran if we know the server data is missing.
 		data = {
 			'_id': guild.id,
-			'prefix': self.prefix,
+			'prefix': None,	#Allows the default prefix to be changed without worried of most servers being unaffected.
 			'roleData': {},
 			'stats': {},
 			'disabledCommands': [],
