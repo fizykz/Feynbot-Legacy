@@ -53,8 +53,8 @@ import discord
 #Self made libraries.  NOTE: These are only the staticly imported libraries.  Under './Commands', './Overrides', and more, are dynamically imported libraries which aren't listed here.
 import utils
 import dbUtils
-import commandInterface
-import languageModule
+import interface
+import languageModule as lang
 import errors
 
 
@@ -62,35 +62,24 @@ import errors
 class Feynbot(discord.Client):
 	def __init__(self):
 		super().__init__()
-		self.utils = utils
 		self.addTask = asyncio.create_task
 		self.sleep = asyncio.sleep
-		self.runConcurrently = asyncio.gather
-
-		self.frequentEmojis = {
-			'repeat': '🔁',
-			'defaultAccepted': '✅',
-			'defaultDenied': '❌',
-		}
 
 		self.commands = {}
 		self.commandOverrides = {}
 		self.events = {}
 		self.eventOverrides = {}
 
-
 	async def on_ready(self): #Bot ready to make API commands and is recieving events.
-		lang = self.program.languageModule.getContent('english', 'onReady')
 		def unlockCheck(message):	#Function to check for an unlock command.
 			if (self.isOwner(message.author.id)):
-				cmd = commandInterface.CommandInterface(self, message)
+				cmd = interface.Interface(self, message)
 				if (cmd.commandIdentifier == 'unlock'):
 					return True
 		self.log(lang[0], False, True)	#"Logged on and ready"
 		self.reloadCommands()
 		self.reloadEvents()
-		for name, emojiID in config['emojis'].items():
-			self.frequentEmojis[name] = self.get_emoji(emojiID)
+		
 		if (self.getSetting('livingCode')):
 			return
 		try:	#TODO:  Try-Excepts need to except any other errors to safelock.
@@ -321,7 +310,7 @@ class Feynbot(discord.Client):
 			return config['levels']['owner']
 		elif (self.isAdmin(ID)):
 			return config['levels']['admin']
-		elif (self.isBanned(ID)):
+		elif (self.isModerator(ID)):
 			return config['levels']['moderator']
 		elif (self.isBanned(ID)):
 			return config['levels']['banned']
@@ -360,7 +349,7 @@ class Feynbot(discord.Client):
 			member = self.user
 		return self.addTask(message.remove_reaction(reaction, member))
 
-	def getFrequentEmoji(self, name):
+	def getEmoji(self, name):
 		if (name in self.frequentEmojis):
 			return str(self.frequentEmojis[name]) or str(self.frequentEmojis["reportMe"])
 		else:
@@ -372,32 +361,35 @@ class Feynbot(discord.Client):
 		return author.display_name + '#' + str(author.discriminator)
 
 	def reactWithBug(self, message):
-		return self.addReaction(message, self.getFrequentEmoji('reportMe'))
+		return self.addReaction(message, self.getEmoji('reportMe'))
 
 	################
 	### Database ###
 	################
-	def getGuildData(self, ID, forceOverride = False):
+	def getGuildData(self, guild, forceOverride = False):
+		ID = None 
+		if (type(guild) == int):
+			ID = guild 
+			guild = None 
 		data = dbUtils.getObjectByID(ID, forceOverride)
 		if (data):
 			return data
-		guild = self.get_guild(ID)
+		if (not guild):
+			guild = self.get_guild(ID)
 		if (guild):
 			return self.setupServer(guild)
 
-	def getUserData(self, ID, preventBanned = True, forceOverride = False):
-		if (preventBanned and self.isBanned(ID)):
-			return False
-		data = dbUtils.getObjectByID(ID, forceOverride)
+	def getUserData(self, user, forceOverride = False): 
+		ID = None 
+		if (type(user) == int):
+			ID = user 
+			user = None 
+		data = dbUtils.getObjectByID(user.id, forceOverride)
 		if (data):
-			if (data['banned']):
-				self.addBanned(id)
-				if (preventBanned):
-					return False
 			return data
-		user = self.get_user(ID)
-		if (user):
-			return self.setupUser(user)
+		if (not user):
+			user = self.get_user(user.id)
+		return self.setupUser(user)
 
 	def setupServer(self, guild):	#Should only be ran if we know the server data is missing.
 		data = {
