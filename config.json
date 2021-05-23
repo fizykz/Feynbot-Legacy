@@ -2,7 +2,7 @@
 	"defaultSettings": {
 		"defaultPrefix": ">",
 		"unlockDuration": [300, 60],
-		"verboseMessaging": false, 
+		"verboseMessaging": 0, 
 		"overrideDiagnostics" : false,
 		"livingCode": false,
 		"safelock": false
@@ -25,18 +25,6 @@
 	"linkedChannels": {
 		"info": 809361130245324831,
 		"alerts": 809360908127436820
-	},
-
-	"emojis": {
-		"accepted": 814316280299126794,
-		"denied": 814316281376931890,
-		"loading": 814316281393578026,
-		"downvote": 814316273021616128,
-		"upvote": 814316277291548683,
-		"feynbot": 814316650291658793,
-		"acceptedStatic": 815804106115383338,
-		"deniedStatic": 815804106727489536,
-		"reportMe": 815936904779399188
 	},
 
 	"permissionLevels": {

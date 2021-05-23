@@ -54,7 +54,7 @@ import discord
 import utils
 import dbUtils
 import interface
-import languageModule as lang
+import languageModule
 import errors
 
 
@@ -341,6 +341,12 @@ class Feynbot(discord.Client):
 	def editMessage(self, message, *args, concurrently = False, **kwargs):
 		return self.addTask(message.edit(*args, **kwargs))
 
+	def delayEdit(self, message, delay, *args, **kwargs):
+		async def helper():
+			await self.sleep(delay)
+			return await message.edit(*args, **kwargs)
+		return self.addTask(helper())
+
 	def addReaction(self, message, emoji, *args, concurrently = False, **kwargs):
 		return self.addTask(message.add_reaction(emoji, *args, **kwargs)) 
 
@@ -350,10 +356,7 @@ class Feynbot(discord.Client):
 		return self.addTask(message.remove_reaction(reaction, member))
 
 	def getEmoji(self, name):
-		if (name in self.frequentEmojis):
-			return str(self.frequentEmojis[name]) or str(self.frequentEmojis["reportMe"])
-		else:
-			return str(self.frequentEmojis["reportMe"])
+		return languageModule.getEmoji(name)
 
 	def stringifyUser(self, author, withID = True):
 		if (withID):
@@ -361,7 +364,7 @@ class Feynbot(discord.Client):
 		return author.display_name + '#' + str(author.discriminator)
 
 	def reactWithBug(self, message):
-		return self.addReaction(message, self.getEmoji('reportMe'))
+		return self.addReaction(message, self.getEmoji('bug'))
 
 	################
 	### Database ###

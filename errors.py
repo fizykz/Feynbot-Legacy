@@ -1,4 +1,4 @@
-import lang
+import languageModule
 
 
 #TODO: Lang
