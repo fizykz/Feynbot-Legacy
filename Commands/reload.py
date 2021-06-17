@@ -1,10 +1,21 @@
-async def command(cmd):
-	if (cmd.isAdmin()):
-		cmd.notifySuccess()
-		cmd.alert(f"Reload ordered by {cmd.getFullUsername()}.", True)
-		cmd.bot.reloadCommands()
-		cmd.bot.reloadEvents()
-		cmd.bot.reloadLibraries()
+#info = {
+#	'name': "",
+#	'aliases': [],
+#	'arguments': [],	
+#	'summary': "",
+#	'hidden': True,
+#}
+#
+#async def command(interface):
+#	pass
+
+
+
+async def command(interface):
+	if (interface.isAdmin()):
+		interface.notifySuccess()
+		interface.log(f"Reload ordered by {interface.stringifyUser()}.", True)
+		interface.bot.reloadAll()
 
 info = {
 	'name': "Reload",

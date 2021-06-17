@@ -1,20 +1,25 @@
-#def command(bot, message, taskQueue, guildData=None):
-#	return #whatever
-#
-#help = {
+#info = {
+#	'name': "",
+#	'aliases': [],
 #	'arguments': [],	
-#	'summary': ""
+#	'summary': "",
+#	'hidden': True,
 #}
 #
-import datetime
-
-async def command(cmd):
-	if (cmd.isModerator()):
-		cmd.reply(cmd.content)
-		cmd.log(cmd.content, False, True)
+#async def command(interface):
+#	pass
 
 info = {
 	'name': "Debug",
 	'summary': "Prints message content and sends an identical message.",
 	'hidden': True
 }
+
+import datetime
+
+async def command(interface):
+	if (interface.isModerator()):
+		interface.reply(interface.content)
+		interface.log(interface.content, False, True)
+		interface.notifySuccess()
+

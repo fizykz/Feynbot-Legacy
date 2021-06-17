@@ -1,11 +1,6 @@
 {
-	"defaultSettings": {
-		"defaultPrefix": ">",
-		"unlockDuration": [300, 60],
-		"verboseMessaging": 0, 
-		"overrideDiagnostics" : false,
-		"livingCode": false,
-		"safelock": false
+	"other": {
+		"prefix": ">"
 	},
 
 	"owners": [
@@ -22,16 +17,8 @@
 		565415161268142081
 	],
 
-	"linkedChannels": {
+	"channels": {
 		"info": 809361130245324831,
 		"alerts": 809360908127436820
-	},
-
-	"permissionLevels": {
-		"owner": 5,
-		"admin": 4,
-		"moderator": 3,
-		"user": 0,
-		"banned": -1
 	}
 }

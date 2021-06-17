@@ -1,16 +1,16 @@
-async def command(cmd):
-	if (cmd.isModerator()):
-		cmd.notifySuccess()
-		boolean = cmd.evaluateBoolean(0)
+async def command(interface):
+	if (interface.isModerator()):
+		interface.notifySuccess()
+		boolean = interface.evaluateBoolean(0)
 		if (boolean == None):
-			boolean = not cmd.bot.getSetting('verboseMessaging')
+			boolean = not interface.bot.getSetting('verboseMessaging')
 		if (boolean):
-			cmd.log(f"Enabling verbose overrides; requested by {cmd.getFullUsername()}.", False, True)
-			cmd.reply("Enabling verbose overrides.")
+			interface.log(f"Enabling verbose overrides; requested by {interface.getFullUsername()}.", False, True)
+			interface.reply("Enabling verbose overrides.")
 		else:
-			cmd.log(f"Disabling verbose overrides; requested by {cmd.getFullUsername()}.", False, True)
-			cmd.reply("Disabling verbose overrides.")
-		cmd.bot.setSetting('verboseMessaging', boolean)
+			interface.log(f"Disabling verbose overrides; requested by {interface.getFullUsername()}.", False, True)
+			interface.reply("Disabling verbose overrides.")
+		interface.bot.setSetting('verboseMessaging', boolean)
 		
 
 info = {

@@ -1,25 +1,25 @@
 import numpy
 
-async def command(cmd):
-	if (cmd.isAdmin()):
+async def command(interface):
+	if (interface.isAdmin()):
 		endDelayStatement = None
 
-		endDelay = cmd.evaluateInteger(0) or 0
+		endDelay = interface.evaluateInteger(0) or 0
 		
 		if (endDelay < 5):
-			endDelayStatement = cmd.bot.getFrequentEmoji('acceptedStatic') + " Closing bot program immediately."
+			endDelayStatement = interface.bot.getFrequentEmoji('acceptedStatic') + " Closing bot program immediately."
 		else:
-			endDelayStatement = cmd.bot.getFrequentEmoji('loading') + " Closing bot program in {} second{}.  ".format(endDelay, cmd.utils.isPlural(endDelay))
+			endDelayStatement = interface.bot.getFrequentEmoji('loading') + " Closing bot program in {} second{}.  ".format(endDelay, interface.utils.isPlural(endDelay))
 
-		cmd.alert(f"Closure ordered by {cmd.getFullUsername()}, closing " + endDelayStatement, True)
-		message = await cmd.reply(endDelayStatement)
-		cmd.notifySuccess()
-		editTask = cmd.delayEdit(message, numpy.clip(endDelay - 6, 0, endDelay), content = cmd.bot.getFrequentEmoji('acceptedStatic') + f" Closing bot program...")
-		canceller = await cmd.bot.end(endDelay)
+		interface.alert(f"Closure ordered by {interface.getFullUsername()}, closing " + endDelayStatement, True)
+		message = await interface.reply(endDelayStatement)
+		interface.notifySuccess()
+		editTask = interface.delayEdit(message, numpy.clip(endDelay - 6, 0, endDelay), content = interface.bot.getFrequentEmoji('acceptedStatic') + f" Closing bot program...")
+		canceller = await interface.bot.end(endDelay)
 		if (canceller):
 			editTask.cancel()
-			cmd.alert(f"Closure cancelled by {cmd.bot.stringifyUser(canceller)}.", True)
-			await message.edit(content = cmd.bot.getFrequentEmoji('deniedStatic') + f" Closure was cancelled by {cmd.bot.stringifyUser(canceller)}.")
+			interface.alert(f"Closure cancelled by {interface.bot.stringifyUser(canceller)}.", True)
+			await message.edit(content = interface.bot.getFrequentEmoji('deniedStatic') + f" Closure was cancelled by {interface.bot.stringifyUser(canceller)}.")
 
 info = {
 	'name': "end",

@@ -6,17 +6,14 @@ def process(bot, message):
 
 
 async def event(bot, message):
-	bot.log("String representation:", repr(message.content))
-	if (message.author.id == bot.user.id): #NEVER EVER respond to ourselves.  Huge security risk.
+	bot.log(f"on_message: {repr(message.content)}", 3)
+	if (message.author.id == bot.user.id): 									#NEVER EVER respond to ourselves.  Huge security risk.
 		return
 	
-	if (message.author.bot): #Don't respond to other bots, (or potentially some)
+	if (message.author.bot):											 	#Don't respond to other bots, (or potentially some)
 		return
 
-	commandInterface = bot.commandInterface(bot, message)
+	commandInterface = bot.interface(bot, message)
 	if (commandInterface.isValidCommand()):
-		bot.log("Found command: \'" + commandInterface.commandName + "\'")
-		try: 
-			return await commandInterface()
-		except Exception as error:
-			commandInterface.notifyError(error)
+		bot.log(f"Found command: {repr(commandInterface.commandIdentifier)}", 2)
+		await commandInterface.runCommand()

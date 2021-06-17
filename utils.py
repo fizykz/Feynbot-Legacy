@@ -17,10 +17,7 @@ def fileToJson(path):
 		jsonObj = json.load(file)
 	return jsonObj
 
-
 privateData = fileToJson('./private.json')
-
-
 
 class TaskQueue():
 	def __init__(self):
@@ -82,11 +79,6 @@ def isVerbPlural(number):
 	if (number == 1):
 		return 's'
 	return ''
-
-def isRedundant(string, number, *args):
-	if (number == 0):
-		return ''
-	return string.format(*args)
 
 def formatPhoneNumber(number):
 	assert (int(number) == number and 0 <= number <= 9999999999), "Should be an integer between 0 and 9999999999."

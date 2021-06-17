@@ -1,19 +1,5 @@
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
 
-#Lead program stuff.  argparse, etc. #TODO: lang.py replacements.
+#Lead program stuff.  argparse, etc. .
 import argparse
 from utils import fileToJson
 from attrdict import AttrDict as AttributeDictionary
@@ -24,16 +10,17 @@ data['packageInfo'] = fileToJson('./packageInfo.json')
 
 #Todo:  All of these as full features:  
 parser = argparse.ArgumentParser(description = "A Python Discord bot with a powerful and modular architecture.")
+parser.add_argument('--verbose', '-v', dest = 'verbosity', action = 'count', default = 0, help = "Prints more content when running the program, -vvv is more verbose than -v.")
+parser.add_argument('--version', '-ver', action = 'version', version = data['packageInfo']['VERSION'], help = "Prints more content when running the program, -vvv is more verbose than -v.")
+parser.add_argument('--overrideDiagnostics', '-d', dest = 'overrideDiagnostics', action = 'store_true', default = 0, help = "Sends all logged messages to diagnostics.") 
+parser.add_argument('--noPrinting', '-np', dest = 'noPrinting', action='store_true', help="Removes trivial bot logging; still prints errors & key events.")
+
+parser.add_argument('--reloadOnError', '-R', dest = 'reloadOnError', action = 'store_true', help = "Reloads commands, events, & more on most errors.")
 parser.add_argument('--resetSafelock', '-s', dest = 'resetSafeLock', action = 'store_true', help = "Resets a safelock if it was in place.")
 parser.add_argument('--livingCode', '-l', dest = 'livingCode', action = 'store_true', help = "Alllows the livingCode to be enabled.  Still needs to be unlocked before the safelock duration to be used the full session.")
 parser.add_argument('--livingCodeSession', dest = 'livingCodeSession', action = 'store_true', help = "Turns off the unlock duration, so the bot won't automatically safelock.  Only use if you know what you're doing.")
-parser.add_argument('--noPrinting', '-p', dest = 'noPrinting', action='store_true', help="Turns off printing for the bot.")
-parser.add_argument('--verbose', '-v', dest = 'verbose', action = 'count', default = 0, help = "Prints more content when running the program, -vvv is more verbose than -v.")
-parser.add_argument('--overrideDiagnostics', '-d', dest = 'overrideDiagnostics', action = 'store_true', default = 0, help = "Sends all logged messages to diagnostics.") 
-parser.add_argument('--version', '-ver', action = 'version', version = data['packageInfo']['VERSION'], help = "Prints more content when running the program, -vvv is more verbose than -v.")
 CLIArguments = parser.parse_args()
 
-#Build-in Libraries (Excluding argparse)
 import numpy
 import asyncio
 import importlib
@@ -46,7 +33,6 @@ import inspect
 import math
 import datetime
 
-#Third party libraries
 import pymongo
 import discord
 
@@ -54,157 +40,159 @@ import discord
 import utils
 import dbUtils
 import interface
-import languageModule
-import errors
-
-
 
 class Feynbot(discord.Client):
 	def __init__(self):
 		super().__init__()
-		self.addTask = asyncio.create_task
-		self.sleep = asyncio.sleep
-
+		self.interface = interface.Interface
 		self.commands = {}
 		self.commandOverrides = {}
 		self.events = {}
 		self.eventOverrides = {}
+		self.settings = AttributeDictionary({
+			'reloadOnError': CLIArguments.reloadOnError,
+			'verbosity': CLIArguments.verbosity if not CLIArguments.noPrinting else -1, 
+			'safelock': False,
+			'prefix': data['other']['prefix']
+		})
+		self.state = AttributeDictionary({
+			'owners': data['owners'],
+			'admins': data['admins'],
+			'moderators': data['moderators'],
+			'channels': data['channels'],
+			'banned': {},
+		})
+		self.log("Starting bot...")
 
-	async def on_ready(self): #Bot ready to make API commands and is recieving events.
-		def unlockCheck(message):	#Function to check for an unlock command.
-			if (self.isOwner(message.author.id)):
-				cmd = interface.Interface(self, message)
-				if (cmd.commandIdentifier == 'unlock'):
-					return True
-		self.log(lang[0], False, True)	#"Logged on and ready"
+		self.frequentEmojis = {
+			'repeat': '🔁',
+			'defaultAccepted': '✅',
+			'defaultDenied': '❌',
+			'accepted': 814316280299126794,
+			'denied': 814316281376931890,
+			'loading': 814316281393578026,
+			'downvote': 814316273021616128,
+			'upvote': 814316277291548683,
+			'feynbot': 814316650291658793,
+			'acceptedStatic': 815804106115383338,
+			'deniedStatic': 815804106727489536,
+			'bug': 815936904779399188,
+		}
+
+	#########################
+	### Startup & Logging ###
+	#########################
+	def setVerbosity(self, verbosity):
+		return 
+	def log(self, message, verbosity = -1, vital = False, sendToDiagnostics = None):
+		if verbosity <= self.settings['verbosity'] or vital:	#verbosity can be set to -1 if {noPrinting} is True.
+			prefix = "ERROR: " if vital else ""
+			print(prefix + str(message))
+			if sendToDiagnostics or (sendToDiagnostics == None and vital):
+				return  
+	def addTask(self, *args, **kwargs):
+		return asyncio.create_task(*args, **kwargs)
+	def sleep(self, delay):
+		self.log(f"Sleeping task for {delay} seconds.", 3)
+		return asyncio.sleep(delay)
+	def getClass(self):	
+		return self.__class__
+	def delayTask(self, delay, function, *args, **kwargs):
+		async def helper():
+			await self.sleep(delay)
+			return function(args, kwargs)
+		return self.addTask(helper())
+	async def on_ready(self): #Bot ready to make API commands & to link events/commands.
+		self.log("Setting up environment.")
 		self.reloadCommands()
 		self.reloadEvents()
-		
-		if (self.getSetting('livingCode')):
-			return
-		try:	#TODO:  Try-Excepts need to except any other errors to safelock.
-			unlockMessage = await self.wait_for('message', check=unlockCheck, timeout=300)
-			self.addReaction(unlockMessage, self.getFrequentEmoji('accepted'))
-			PromptPINMessage = await self.DMUserFromMessage(unlockMessage, lang[1])	#"Please type administrative PIN"
-			def DMCheck(message):
-				if (PromptPINMessage.channel == message.channel and message.author != self.user):
-					return True 
-			try:
-				PINMessage = await self.wait_for('message', check=DMCheck, timeout=60)
-				print(PINMessage.content, privateData['PIN'])
-				if (PINMessage.content != privateData['PIN']):
-					self.addReaction(PINMessage, self.getFrequentEmoji('denied'))
-					self.safelock()
-					self.alert(lang[2], True)	#"Safelocking the bot; incorrect PIN.""
-					return False
-				self.addReaction(PINMessage, self.getFrequentEmoji('accepted'))
-				PromptSMSMessage = await self.DMUserFromMessage(unlockMessage, lang[3]) #"Please type sent SMS key"
-				SMSKey = utils.getRandomString(6)
-				SMS = utils.sendSMS(privateData['phone']['number'], privateData['phone']['carrier'], lang[4] + SMSKey) #"Here is SMS key"
-				if (not SMS):
-					self.replyToMessage(PromptSMSMessage, lang[5]) #"Error occured while sending SMS"
-					self.alert(lang[6].format(self.prefix), True)	#"Error occured while >unlocking"
-					self.safelock()
-					self.addReaction(PromptSMSMessage, self.getFrequentEmoji('denied'))
-				SMSMessage = await self.wait_for('message', check=DMCheck, timeout=60)
-				if (SMSMessage.content == SMSKey):
-					self.DMUserFromMessage(unlockMessage, lang[6]) #"Bot has been unlocked for this session/until safelock."
-					self.alert(lang[6], True) #"Same ^^^"
-					self.setSetting('livingCode', True)
-					self.addReaction(SMSMessage, self.getFrequentEmoji('accepted'))
-					return True
-				else:
-					self.addReaction(SMSMessage, self.getFrequentEmoji('denied'))
-					self.safelock()
-					self.alert(lang[7].format(self.prefix), True)	#Incorrect SMS attempt, safelocking
-					return False
-			except asyncio.TimeoutError as error:
-				self.alert(lang[8], True)	#Safelocking after a timeout after >unlock
-				self.safelock()
-		except asyncio.TimeoutError as error:
-			self.log(lang[9], False)	#Safelocking after inactivity.
-			self.safelock()
-	######################
+		self.log("Bot ready!")
+		#TODO Add verification for Living Code 
+
+	#########################
+	### Messaging & Other ###
+	#########################
+	def getBotEmoji(self, name):
+		return self.get_emoji(self.frequentEmojis[name]) or self.get_emoji(name)
+	def stringifyUser(self, user, withID = True):
+		if (withID):
+			return f"{user.name}#{str(user.discriminator)} <UID:{str(user.id)}>"
+		return f"{user.name}#{str(user.discriminator)}"
+	def addReaction(self, message, emoji):
+		return self.addTask(message.add_reaction(emoji))
+	def send(self, channel, content, *args, **kwargs):
+		return self.addTask(channel.send(content, *args, **kwargs))
+	def reply(self, message, content, *args, **kwargs):
+		return self.send(message.channel, content, *args, **kwargs)
+	######################	
 	### Event Handling ###
 	######################
-	def handleEvent(self, eventName):
-		async def handler(*args):
-			IDs = [] #List of IDs to check for when looking for an event override.
-			if (eventName in self.events and hasattr(self.events[eventName], 'process')):
-				process = self.events[eventName].process
-				assert process.__code__.co_argcount - len(process.__defaults__ or ()), "The " + eventName + " process() function has the incorrect number of arguments.  Check Discord.py API reference."
-				IDs = process(self, *args)
-
-			if (inspect.iscoroutinefunction(self.getEvent(eventName, IDs))):
-				return self.addTask(self.getEvent(eventName, IDs)(self, *args))
-			else:
-				return self.getEvent(eventName, IDs)(self, *args)
-
-		handler.__name__ = eventName #Rename the handler to the event name (Discord.py needs this).
-		self.event(handler)	#Use Discord library to hook the event.
-
 	def reloadEvents(self, overrides=True):
-		self.log('Reloading events...', True, True)			
-
-		for fileName in os.listdir('./Events'):	#Iterate over event files.
-			if (fileName.endswith('.py')):	#Only .py files.
-				eventName = fileName[0:-3]	#Get rid of .py for the event name
-				try:	#Try, in case the module errors.
-					self.events[eventName] = importlib.import_module('Events.' + eventName)	#Import and store the module in the events collection.
-					importlib.reload(self.events[eventName])	#Reload module just in case
-					self.handleEvent(eventName)
-				except SyntaxError as error:
-					self.alert(eventName + ".py errored: " + str(error), True)	#Warn us about import errors.
-		for eventName, module in self.events.items():				#Go over current events, see if any were removed
-			if (not (eventName + '.py') in os.listdir('./Events')):	# Check if it's still in the directory
-				self.events[eventName] = None 	#Remove module.
-
+		for fileName in os.listdir('./Events'):													# Iterate over normal event files.
+			if (fileName.endswith('.py')):														# Only .py files.
+				eventName = fileName[0:-3]														# Get rid of .py for the event name
+				try:																			# Try, in case the module errors.
+					self.events[eventName] = importlib.import_module('Events.' + eventName)		# Import and store the module in the events collection.
+					importlib.reload(self.events[eventName])									# Reload module just in case this has been imported before and we're not sure.
+					self.handleEvent(eventName)													# Make sure the event is listened for.
+				except SyntaxError as error:													# Catch Syntax errors
+					self.log(eventName + ".py errored: " + repr(error), -1, True)				# Warn us about import errors.
+		for eventName, module in self.events.items():											# Go over current events, see if any were removed from our directory.
+			if (not (eventName + '.py') in os.listdir('./Events')):								# Check if it's still in the directory
+				self.events[eventName] = None 													# Remove module if they aren't.
 		if (overrides):
-			for folderName in os.listdir('./EventOverrides'):	#Iterate over override folders.
-				if (re.match(r'\d+', folderName) and not re.search(r'\.', folderName)):	#Only get folder/files with a number sequence at the beginning and no '.' in the name
-					ID = re.match(r'\d+', folderName).group(0)	#Get the number sequence (ID)
-					for fileName in os.listdir('./EventOverrides/' + folderName + '/'):	#Iterate over override events.
-						if (not ID in self.eventOverrides):	#Make sure the dictionary exists 
-							self.eventOverrides[ID] = {
-								'__directory': './EventOverrides/' + folderName + '/',	#Create a collection for the collection of overrides.
+			for folderName in os.listdir('./EventOverrides'):									# Iterate over override folders.
+				if (re.match(r'\d+', folderName) and not re.search(r'\.', folderName)):			# Only get folder/files with a number sequence at the beginning and no '.' in the name
+					ID = re.match(r'\d+', folderName).group(0)									# Get the number sequence of the override directory (ID)
+					for fileName in os.listdir('./EventOverrides/' + folderName + '/'):			# Iterate over files in the directory.
+						if (not ID in self.eventOverrides):										# Make sure the dictionary exists 
+							self.eventOverrides[ID] = {											
+								'__directory': './EventOverrides/' + folderName + '/',			# Create a collection for the collection of overrides.
 							}
-						if (fileName.endswith('.py')):	#Check to make sure it's a .py file.
-							eventName = fileName[0:-3]	#Get the event name.
-							try:	#Make sure it doesn't error on import 
-								self.eventOverrides[ID][eventName] = importlib.import_module('EventOverrides.' + folderName + '.' + eventName)	#Manually import it and store it.
-								importlib.reload(self.eventOverrides[ID][eventName])	#Reload in case it was prior.
-								self.handleEvent(eventName)
+						if (fileName.endswith('.py')):											# Check to make sure it's a .py file.
+							eventName = fileName[0:-3]											# Get the event name.
+							try:																# Make sure it doesn't error on import 
+								self.eventOverrides[ID][eventName] = importlib.import_module('EventOverrides.' + folderName + '.' + eventName)	# Manually import it and store it.
+								importlib.reload(self.eventOverrides[ID][eventName])			# Reload in case it imports just the "old version".
+								self.handleEvent(eventName)										# Make sure the event is listened for.
 							except SyntaxError as error: 
-								self.alert(eventName + ".py errored: " + str(error), True)	#Warn if an error was thrown.
-			for ID, folder in self.eventOverrides.items():	#Go over current override collections, see if any were removed
-				for eventName in tuple(folder.keys()):	#Go over events in the collections.
-					if (eventName != '__directory'):	#Make sure we're not iterating over the metadata
-						if (not (eventName + '.py') in os.listdir(folder['__directory'])):
-							del folder[eventName]	#Delete any override we don't have anymore
+								self.alert(eventName + ".py errored: " + repr(error), True)		# Warn if an error was thrown.
+			for ID, folder in self.eventOverrides.items():										# Go over current override collections, see if any were removed
+				for eventName in tuple(folder.keys()):											# Go over events in the collections.
+					if (eventName != '__directory'):											# Make sure we're not iterating over the metadata
+						if (not (eventName + '.py') in os.listdir(folder['__directory'])):		# If we can't find an event that's no longer in the folder.
+							del folder[eventName]												# Delete any override we don't have anymore
+	def handleEvent(self, eventName):															# Given an eventName it listens for the event and handles it, finds the correct event/passes args/etc.
+		async def handler(*args):																	# Define our handler function, which is what is called when an event is fired.
+			IDs = [] 																				# List of IDs to check for when looking for an *event override*.				
+			if (eventName in self.events and hasattr(self.events[eventName], 'process')):			# If our event module has a process method we need to figure out how to sort overrides.
+				process = self.events[eventName].process											# Get our process function.
+				assert process.__code__.co_argcount - len(args) - 1 == 0, f"The {eventName} event process() function has {process.__code__.co_argcount} arguments, {eventName} event gives {len(args)} however.  Check Discord.py API reference."
+				IDs = process(self, *args)
+			try:
+				if (inspect.iscoroutinefunction(self.getEvent(eventName, IDs).event)):					# Allows us to run coroutines & functions.	
+					return self.addTask(self.getEvent(eventName, IDs).event(self, *args))				# Run a coroutine
+				else:
+					return self.getEvent(eventName, IDs).event(self, *args)								# Run a function
+			except Exception as error:
+				if self.settings['reloadOnError']:
+					self.log("Reloading libraries after an error.", -1, True)
+					self.reloadAll()
+				raise error
 
-		self.log('Events reloaded.', True, True)
-		return #Iterate over folders, find modules, import.
-
-	def getEvent(self, event, IDs, returnModule = False):
+		handler.__name__ = eventName 															# Rename the handler to the event name (Discord.py needs the name of the function to match.)
+		self.event(handler)																		# Use Discord library to hook the event.	
+	def getEvent(self, event, IDs):																# Get the highest priority event module.
 		for ID in IDs:
 			ID = str(ID)
 			if (ID in self.eventOverrides and event in self.eventOverrides[ID]):
-				if (returnModule):
-					return self.eventOverrides[ID][event]
-				else: 
-					return self.eventOverrides[ID][event].event
+				return self.eventOverrides[ID][event]
 		if (event in self.events):
-			if (returnModule):
-				return self.events[event]
-			else: 
-				return self.events[event].event
-		return None
+			return self.events[event]
 	########################
 	### Command Handling ###
 	########################
 	def reloadCommands(self, overrides=True):
-		self.log('Reloading commands...', True, True)			
-
 		for commandName in tuple(self.commands.keys()):				#Go over current commands, see if any were removed
 			if (not (commandName + '.py') in os.listdir('./Commands')):
 				del self.commands[commandName]
@@ -225,7 +213,7 @@ class Feynbot(discord.Client):
 								self.alert(commandName + ".py errored trying to impliment alias \"" + alias + "\" but it was already taken by " + self.commands[alias].__name__ + ".py", True, True)
 				except SyntaxError as error:
 					self.commands[commandName] = error 
-					self.alert(commandName + ".py errored: " + str(error), True)
+					self.alert(commandName + ".py errored: " + repr(error), True)
 
 		if (overrides):
 			for ID in tuple(self.commandOverrides.keys()):				#Go over current commands, see if any were removed
@@ -258,13 +246,8 @@ class Feynbot(discord.Client):
 											self.alert(commandName + ".py errored trying to impliment alias \"" + alias + "\" but it was already taken by " + self.commandOverrides[ID][alias].__name__ + ".py", True, True)
 							except SyntaxError as error:
 								self.commands[commandName] = error
-								self.alert(commandName + ".py errored: " + str(error), True)
-
-
-		self.log('Commands reloaded.', True, True)
-		return #Iterate over folders, find modules, import.
-
-	def getCommand(self, commandIdentifier, channelID = None, guildID = None, returnModule = False):
+								self.alert(commandName + ".py errored: " + repr(error), True)
+	def getCommand(self, commandIdentifier, channelID = None, guildID = None):
 		module = None
 		if (channelID and channelID in self.commandOverrides and commandIdentifier in self.commandOverrides[channelID]):
 			module = self.commandOverrides[channelID][commandIdentifier]
@@ -273,99 +256,32 @@ class Feynbot(discord.Client):
 		elif (commandIdentifier in self.commands):
 			module = self.commands[commandIdentifier]
 
-		if (returnModule):	
-			return module
-		else:
-			return module.command
-		return None
-	#################
-	### Utilities ###
-	#################
-	def getClass(self):	
-		return self.__class__
-
+		return module or None 
+	##############################
+	### Permissions & Security ###
+	##############################
+	def reloadAll(self, overrides = True):
+		self.reloadEvents(overrides)
+		self.reloadCommands(overrides)
+		self.interface = importlib.reload(interface).Interface
 	def isOwner(self, ID, canBeSelf = False):
-		return ID in self.state['owners'] and (ID != self.user.id or canBeSelf)
-
+		return ID in self.state.owners and (ID != self.user.id or canBeSelf)
 	def isAdmin(self, ID, canBeSelf = False):
-		return ID in self.state['admins'] or self.isOwner(ID, canBeSelf)
-
+		return ID in self.state.admins or self.isOwner(ID, canBeSelf)
 	def isModerator(self, ID, canBeSelf = False):
-		return ID in self.state['moderator'] or self.isAdmin(ID, canBeSelf)
-
+		return ID in self.state.moderators or self.isAdmin(ID, canBeSelf)
 	def isBanned(self, ID):
-		return ID in self.state['bannedUsers']
-
+		return ID in self.state.banned
 	def addBanned(self, ID):
 		self.state['bannedUsers'].append(ID)
 		#TODO:  Add to datastore
-
 	def clearAdmins(ownersToo = True):
 		self.data['admins'] = []
 		if (ownersToo):
 			self.data['owner'] = []
-
-	def getPermissionLevel(self, ID, canBeSelf = False):
-		if (self.isOwner(ID, canBeSelf)):
-			return config['levels']['owner']
-		elif (self.isAdmin(ID)):
-			return config['levels']['admin']
-		elif (self.isModerator(ID)):
-			return config['levels']['moderator']
-		elif (self.isBanned(ID)):
-			return config['levels']['banned']
-		else:
-			return config['levels']['user']
-
 	def safelock(self):
+		self.log("Safelocking the bot.", -1, True)
 		self.settings['safelock'] = False
-
-	def sendMessage(self, channel, *args, **kwargs):
-		return self.addTask(channel.send(*args, **kwargs))
-
-	def replyToMessage(self, message, *args, **kwargs):
-		return self.addTask(message.channel.send(*args, **kwargs))
-
-	def DMUser(self, user, *args, **kwargs):
-		channel = user.dm_channel
-		if (channel):
-			return self.addTask(channel.send(*args, **kwargs))
-		else:
-			async def helper():
-				return await (await user.create_dm()).send(*args, **kwargs)
-			return self.addTask(helper())
-		
-	def DMUserFromMessage(self, message, *args, **kwargs):
-		return self.DMUser(message.author, *args, **kwargs)
-
-	def editMessage(self, message, *args, concurrently = False, **kwargs):
-		return self.addTask(message.edit(*args, **kwargs))
-
-	def delayEdit(self, message, delay, *args, **kwargs):
-		async def helper():
-			await self.sleep(delay)
-			return await message.edit(*args, **kwargs)
-		return self.addTask(helper())
-
-	def addReaction(self, message, emoji, *args, concurrently = False, **kwargs):
-		return self.addTask(message.add_reaction(emoji, *args, **kwargs)) 
-
-	def removeReaction(self, message, reaction, concurrently = False, member = None):
-		if (not member):
-			member = self.user
-		return self.addTask(message.remove_reaction(reaction, member))
-
-	def getEmoji(self, name):
-		return languageModule.getEmoji(name)
-
-	def stringifyUser(self, author, withID = True):
-		if (withID):
-			return author.display_name + '#' + str(author.discriminator) + ' (' + str(author.id) + ')'
-		return author.display_name + '#' + str(author.discriminator)
-
-	def reactWithBug(self, message):
-		return self.addReaction(message, self.getEmoji('bug'))
-
 	################
 	### Database ###
 	################
@@ -381,7 +297,6 @@ class Feynbot(discord.Client):
 			guild = self.get_guild(ID)
 		if (guild):
 			return self.setupServer(guild)
-
 	def getUserData(self, user, forceOverride = False): 
 		ID = None 
 		if (type(user) == int):
@@ -393,7 +308,6 @@ class Feynbot(discord.Client):
 		if (not user):
 			user = self.get_user(user.id)
 		return self.setupUser(user)
-
 	def setupServer(self, guild):	#Should only be ran if we know the server data is missing.
 		data = {
 			'_id': guild.id,
@@ -410,7 +324,6 @@ class Feynbot(discord.Client):
 		}
 		dbUtils.setObject(data)
 		return data 
-
 	def setupUser(self, user):
 		data = {
 			'_id': user.id,

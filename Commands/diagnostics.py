@@ -1,16 +1,16 @@
-async def command(cmd):
-	if (cmd.isModerator()):
-		cmd.notifySuccess()
-		boolean = cmd.evaluateBoolean(0)
+async def command(interface):
+	if (interface.isModerator()):
+		interface.notifySuccess()
+		boolean = interface.evaluateBoolean(0)
 		if (boolean == None):
-			boolean = not cmd.bot.getSetting('overrideDiagnostics')
+			boolean = not interface.bot.getSetting('overrideDiagnostics')
 		if (boolean):
-			cmd.log(f"Enabling diagnostic overrides; requested by {cmd.getFullUsername()}.", False, True)
-			cmd.reply("Enabling diagnostic overrides.")
+			interface.log(f"Enabling diagnostic overrides; requested by {interface.getFullUsername()}.", False, True)
+			interface.reply("Enabling diagnostic overrides.")
 		else:
-			cmd.log(f"Disabling diagnostic overrides; requested by {cmd.getFullUsername()}.", False, True)
-			cmd.reply("Disabling diagnostic overrides.")
-		cmd.bot.setSetting('overrideDiagnostics', boolean)
+			interface.log(f"Disabling diagnostic overrides; requested by {interface.getFullUsername()}.", False, True)
+			interface.reply("Disabling diagnostic overrides.")
+		interface.bot.setSetting('overrideDiagnostics', boolean)
 		
 
 info = {
