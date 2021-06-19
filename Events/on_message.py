@@ -6,7 +6,7 @@ def process(bot, message):
 
 
 async def event(bot, message):
-	bot.log(f"on_message: {repr(message.content)}", 3)
+	bot.log(f"on_message: {repr(message.content)}", 4)
 	if (message.author.id == bot.user.id): 									#NEVER EVER respond to ourselves.  Huge security risk.
 		return
 	
@@ -15,5 +15,5 @@ async def event(bot, message):
 
 	commandInterface = bot.interface(bot, message)
 	if (commandInterface.isValidCommand()):
-		bot.log(f"Found command: {repr(commandInterface.commandIdentifier)}", 2)
+		bot.log(f"Command `{repr(commandInterface.commandIdentifier)}` found.", 2, title = 'Command')
 		await commandInterface.runCommand()

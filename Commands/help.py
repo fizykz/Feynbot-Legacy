@@ -5,7 +5,7 @@
 #async def command(interface):
 #	pass
 #
-#
+#close all
 
 info = {
 	'arguments': [],

@@ -1,17 +1,13 @@
-async def command(interface):
-	if (interface.isModerator()):
-		interface.notifySuccess()
-		boolean = interface.evaluateBoolean(0)
-		if (boolean == None):
-			boolean = not interface.bot.getSetting('overrideDiagnostics')
-		if (boolean):
-			interface.log(f"Enabling diagnostic overrides; requested by {interface.getFullUsername()}.", False, True)
-			interface.reply("Enabling diagnostic overrides.")
-		else:
-			interface.log(f"Disabling diagnostic overrides; requested by {interface.getFullUsername()}.", False, True)
-			interface.reply("Disabling diagnostic overrides.")
-		interface.bot.setSetting('overrideDiagnostics', boolean)
-		
+#info = {
+#	'name': "",
+#	'aliases': [],
+#	'arguments': [],	
+#	'summary': "",
+#	'hidden': True,
+#}
+#
+#async def command(interface):
+#	pass
 
 info = {
 	'name': "Diagnostics",
@@ -19,3 +15,25 @@ info = {
 	'summary': "Enables diagnostic overrides for the bot.",
 	'hidden': True
 }
+
+async def command(interface):
+	if (interface.isModerator()):
+		boolean = interface.evaluateBoolean(0)
+		if (len(interface.parsedArguments) == 0):
+			interface.reply(f"Diagnostics are currently set to `{interface.bot.settings['overrideDiagnostics']}`")
+			return 
+		elif (boolean == None):
+			interface.reply(f"Please check your first argument if you were attempting to set the override.\nDiagnostics are currently set to `{interface.bot.settings['overrideDiagnostics']}`")
+			return 
+		elif (boolean):
+			interface.logLink(f"Enabling diagnostic overrides; requested by {interface.stringifyUser()}.", -1, True, True, color = 203, title = 'Settings')
+			interface.reply("Enabling diagnostic overrides.")
+			interface.notifySuccess()
+		elif (boolean == False):
+			interface.logLink(f"Disabling diagnostic overrides; requested by {interface.stringifyUser()}.", -1, True, True, color = 203, title = 'Settings')
+			interface.reply("Disabling diagnostic overrides.")
+			interface.notifySuccess()
+		interface.bot.settings['overrideDiagnostics'] = boolean
+		
+		
+

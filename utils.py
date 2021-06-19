@@ -86,32 +86,6 @@ def formatPhoneNumber(number):
 	number = number[:3] + '-' + number[3:6] + '-' + number[6:]
 	return number
 
-def sendSMS(number, carrier, message):
-	carriers = {
-		'at&t':    '@mms.att.net',
-		't-mobile':' @tmomail.net',
-		'verizon':  '@vtext.com',
-		'sprint':   '@messaging.sprintpcs.com'
-	}
-	assert (carrier.lower() in carriers), "Second argument should be a string of a valid carrier ('at&t', 't-mobile', 'verizon', or 'sprint')"
-	if (carrier == 't-mobile' and not int(number)):
-		number = number[:3] + number[4:7] + number[8:]
-	else:
-		if (int(number) and 0 <= number <= 9999999999):
-			number = formatPhoneNumber(number)
-	assert re.match(r'^\d{3}\-\d{3}\-\d{4}$', str(number)), "First argument should be a phone number formatted as 'XXX-XXX-XXXX' or XXXXXXXXXX"
-	
-	## Establish a secure session with gmail's outgoing SMTP server using your gmail account
-	try:
-		server = smtplib.SMTP("smtp.gmail.com", 587)
-		server.starttls()
-		server.login(privateData['email']['username'], privateData['email']['password'])
-		server.sendmail(privateData['email']['username'], '{}{}'.format(number, carriers[carrier.lower()]), '\n' + message)
-		return True
-	except Exception as error:
-		print(error)
-		return False
-
 def updateOverIterable(iterable, function):
 	if (isinstance(iterable, collections.abc.Mapping)):
 		for index in iterable.keys():
