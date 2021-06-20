@@ -58,7 +58,7 @@
         text.classList.remove('hidden');
         vid.classList.remove('hidden');
         request = new XMLHttpRequest();
-        request.open("POST", "http://99.197.208.116:5000/api/verify", false);
+        request.open("POST", "https://99.197.208.116:5000/api/verify", false);
         console.log(verifyCode)
         if (verifyCode) {
         	request.send(verifyCode)
