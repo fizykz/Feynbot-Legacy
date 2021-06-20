@@ -58,11 +58,11 @@
         prompt.classList.add('hidden');
         text.classList.remove('hidden');
         vid.classList.remove('hidden');
-        request = new XMLHttpRequest();
-        request.open("POST", "https://99.197.208.116:5000/api/verify", false);
-        console.log(verifyCode)
         if (verifyCode) {
-        	request.send(verifyCode)
+		request = new XMLHttpRequest();
+    		request.open("GET", "http://99.197.208.116:5000/api/verify/" + verifyCode, false);
+		console.log(verifyCode)
+        	request.send()
         	console.log('end')
         }
         // POST
