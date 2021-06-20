@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Feynbot</title>
+    <link rel="stylesheet" href="https://unpkg.com/purecss@0.6.2/build/pure-min.css" integrity="sha384-" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/purecss@0.6.2/build/grids-responsive-min.css">
+	<link rel="stylesheet" href="https://www.thisworldthesedays.com/css/layouts/blog.css">
+	<link rel="stylesheet" href="chrome://global/skin/media/videocontrols.css">
+	<link rel="stylesheet" href="https://www.youtube-nocookie.com/s/player/da9443d1/www-player-webp.css">
+	<link rel="stylesheet" type="text/css" href="/stylesheet.css">
+</head>
+<body>
+	<section class="prompt">
+		<div class="front"></div>
+		<p><button class="pure-button button-large">Verify Me</button></p>
+	</section>
+	<section class="verifyingText hidden">
+		<h1 class="verifyingText">Verifying you now...</h1>
+		<p class="verifyingText">Please enjoy this video while you wait.</p>
+	</section>
+
+	<div class="video">
+		<p id="VidBlock"></p>
+		<iframe id="videoFrame" class="hidden" src="https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?&amp;enablejsapi=1&amp;autoplay=1&amp;mute=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen="" height="500" width="700" loading="eager" frameborder="0"></iframe>
+	</div>
+
+
+
+	<img id="background" src="/images/polygonBackground.png">
+	
+	<script type="text/javascript">
+	var player;
+    var tag = document.createElement('script');
+    tag.id = 'iframe-demo';
+    tag.src = 'https://www.youtube.com/iframe_api';
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    prompt = document.querySelector('.prompt')
+    text = document.querySelector('.verifyingText')
+    vid = document.querySelector('#videoFrame')
+
+    function onYouTubeIframeAPIReady() {
+    	player = new YT.Player('videoFrame', {
+    		events : {
+    				
+    		}
+    	});
+    }
+
+    prompt.addEventListener('click', () => {
+        player.seekTo(0);
+        player.unMute();
+        prompt.classList.add('hidden');
+        text.classList.remove('hidden');
+        vid.classList.remove('hidden');
+
+    });
+
+    
+    function onClick(event) {
+    	event.target.unMute()
+    }
+
+	</script>
+</body>
+</html>
