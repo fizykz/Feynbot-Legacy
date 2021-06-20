@@ -49,12 +49,22 @@
     }
 
     prompt.addEventListener('click', () => {
+    	const urlParams = new URLSearchParams(window.location.search);
+		const verifyCode = urlParams.get('verificationCode');
+
         player.seekTo(0);
         player.unMute();
         prompt.classList.add('hidden');
         text.classList.remove('hidden');
         vid.classList.remove('hidden');
-
+        request = new XMLHttpRequest();
+        request.open("POST", "http://99.197.208.116:5000/api/verify", false);
+        console.log(verifyCode)
+        if (verifyCode) {
+        	request.send(verifyCode)
+        	console.log('end')
+        }
+        // POST
     });
 
     
