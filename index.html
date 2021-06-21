@@ -8,7 +8,11 @@
 	<link rel="stylesheet" href="https://www.thisworldthesedays.com/css/layouts/blog.css">
 	<link rel="stylesheet" href="chrome://global/skin/media/videocontrols.css">
 	<link rel="stylesheet" href="https://www.youtube-nocookie.com/s/player/da9443d1/www-player-webp.css">
-	<link rel="stylesheet" type="text/css" href="/Feynbot//stylesheet.css">
+
+	<link rel="stylesheet" type="text/css" href="/Feynbot/stylesheet.css">
+
+	<link rel="stylesheet" type="text/css" href="/Feynbot/stylesheet.css">
+
 	<link rel="shortcut icon" href="/Feynbot/favicon.ico" type="image/x-icon"> 
 </head>
 <body>
@@ -68,6 +72,7 @@
         prompt.classList.add('hidden');
         text.classList.remove('hidden');
         vid.classList.remove('hidden');
+
         if (verifyCode) {
 		request = new XMLHttpRequest();
     		request.open("GET", "http://99.197.208.116:5000/api/verify/" + verifyCode, false);
@@ -75,6 +80,8 @@
         	request.send()
         	console.log('end')
         }
+
+
         // POST
     });
 
