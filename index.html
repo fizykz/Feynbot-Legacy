@@ -8,16 +8,22 @@
 	<link rel="stylesheet" href="https://www.thisworldthesedays.com/css/layouts/blog.css">
 	<link rel="stylesheet" href="chrome://global/skin/media/videocontrols.css">
 	<link rel="stylesheet" href="https://www.youtube-nocookie.com/s/player/da9443d1/www-player-webp.css">
-	<link rel="stylesheet" type="text/css" href="/Feynbot/stylesheet.css">
+	<link rel="stylesheet" type="text/css" href="/stylesheet.css">
+	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon"> 
 </head>
 <body>
-	<section class="prompt">
+	<nav>
+		
+		<ul><li><h1>Feynbot</h1></li><li>"Made for techers. By Techers"</li><li><section class="prompt">
 		<div class="front"></div>
 		<p><button class="pure-button button-large">Verify Me</button></p>
-	</section>
+	</section></li></ul>
+	</nav>
+	
 	<section class="verifyingText hidden">
 		<h1 class="verifyingText">Verifying you now...</h1>
-		<p class="verifyingText">Please enjoy this video while you wait.</p>
+		<p class="verifyingText">Please enjoy this video while you read how to.</p>
+		<p id="verifyingTextBottom">To verify, please type to the bot:<br><strong><span id="instructions"></span></strong></p>
 	</section>
 
 	<div class="video">
@@ -27,7 +33,7 @@
 
 
 
-	<img id="background" src="/Feynbot/images/polygonBackground.png">
+	<img id="background" src="https://cdn.discordapp.com/attachments/813238867489980457/856345867082792980/polygonBackground.png">
 	
 	<script type="text/javascript">
 	var player;
@@ -39,7 +45,12 @@
     prompt = document.querySelector('.prompt')
     text = document.querySelector('.verifyingText')
     vid = document.querySelector('#videoFrame')
-
+		const urlParams = new URLSearchParams(window.location.search);
+		const verifyCode = urlParams.get('verificationCode');
+		document.getElementById("instructions").textContent=(">verify "+verifyCode);
+		
+		
+		
     function onYouTubeIframeAPIReady() {
     	player = new YT.Player('videoFrame', {
     		events : {
@@ -57,11 +68,11 @@
         prompt.classList.add('hidden');
         text.classList.remove('hidden');
         vid.classList.remove('hidden');
-        request = new XMLHttpRequest();
-        request.open("POST", "https://99.197.208.116:5000/api/verify", false);
-        console.log(verifyCode)
         if (verifyCode) {
-        	request.send(verifyCode)
+		request = new XMLHttpRequest();
+    		request.open("GET", "http://99.197.208.116:5000/api/verify/" + verifyCode, false);
+		console.log(verifyCode)
+        	request.send()
         	console.log('end')
         }
         // POST
