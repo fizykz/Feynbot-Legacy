@@ -9,11 +9,11 @@
 	<link rel="stylesheet" href="chrome://global/skin/media/videocontrols.css">
 	<link rel="stylesheet" href="https://www.youtube-nocookie.com/s/player/da9443d1/www-player-webp.css">
 
-	<link rel="stylesheet" type="text/css" href="/Feynbot/stylesheet.css">
+	<link rel="stylesheet" type="text/css" href="stylesheet.css">
 
-	<link rel="stylesheet" type="text/css" href="/Feynbot/stylesheet.css">
+	<link rel="stylesheet" type="text/css" href="stylesheet.css">
 
-	<link rel="shortcut icon" href="/Feynbot/favicon.ico" type="image/x-icon"> 
+	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon"> 
 </head>
 <body>
 	<nav>
@@ -39,57 +39,9 @@
 
 	<img id="background" src="https://cdn.discordapp.com/attachments/813238867489980457/856345867082792980/polygonBackground.png">
 	
-	<script type="text/javascript">
-	var player;
-    var tag = document.createElement('script');
-    tag.id = 'iframe-demo';
-    tag.src = 'https://www.youtube.com/iframe_api';
-    var firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-    prompt = document.querySelector('.prompt')
-    text = document.querySelector('.verifyingText')
-    vid = document.querySelector('#videoFrame')
-		const urlParams = new URLSearchParams(window.location.search);
-		const verifyCode = urlParams.get('verificationCode');
-		document.getElementById("instructions").textContent=(">verify "+verifyCode);
-		
-		
-		
-    function onYouTubeIframeAPIReady() {
-    	player = new YT.Player('videoFrame', {
-    		events : {
-    				
-    		}
-    	});
-    }
-
-    prompt.addEventListener('click', () => {
-    	const urlParams = new URLSearchParams(window.location.search);
-		const verifyCode = urlParams.get('verificationCode');
-
-        player.seekTo(0);
-        player.unMute();
-        prompt.classList.add('hidden');
-        text.classList.remove('hidden');
-        vid.classList.remove('hidden');
-
-        if (verifyCode) {
-		request = new XMLHttpRequest();
-    		request.open("GET", "http://99.197.208.116:5000/api/verify/" + verifyCode, false);
-		console.log(verifyCode)
-        	request.send()
-        	console.log('end')
-        }
-
-
-        // POST
-    });
-
-    
-    function onClick(event) {
-    	event.target.unMute()
-    }
-
-	</script>
+	
+	
 </body>
+<script src="https://unpkg.com/scrollreveal"></script>
+	<script src="script.js"></script>
 </html>
