@@ -19,7 +19,7 @@
 	<section class="verifyingText hidden">
 		<h1 class="verifyingText">Verifying you now...</h1>
 		<p class="verifyingText">Please enjoy this video while you read how to.</p>
-		<p id="verifyingTextBottom">To verify, please type to the bot:<br><strong><span></span></strong></p>
+		<p id="verifyingTextBottom">To verify, please type to the bot:<br><strong><span id="instructions"></span></strong></p>
 	</section>
 
 	<div class="video">
@@ -41,7 +41,12 @@
     prompt = document.querySelector('.prompt')
     text = document.querySelector('.verifyingText')
     vid = document.querySelector('#videoFrame')
-
+		const urlParams = new URLSearchParams(window.location.search);
+		const verifyCode = urlParams.get('verificationCode');
+		document.getElementById("instructions").textContent=(">verify "+verifyCode);
+		
+		
+		
     function onYouTubeIframeAPIReady() {
     	player = new YT.Player('videoFrame', {
     		events : {
