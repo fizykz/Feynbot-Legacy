@@ -160,6 +160,14 @@ class Feynbot(discord.Client):
 		return self.addTask(channel.send(content, *args, **kwargs))
 	def replyTo(self, message, content, *args, **kwargs):
 		return self.addTask(message.reply(content, *args, **kwargs))
+	def DMUser(self, user, content, *args, **kwargs):
+		if user.dm_channel:
+			return self.send(user.dm_channel, content, *args, **kwargs)
+		else:
+			async def DMHelper():
+				await user.create_dm()
+				return self.send(user.dm_channel, content, *args, **kwargs)
+			return self.addTask(DMHelper)
 	
 	######################	
 	### Event Handling ###
@@ -242,7 +250,7 @@ class Feynbot(discord.Client):
 					importlib.reload(self.commands[commandName])	#Reload module just in case
 					if ('init' in self.commands[commandName].info and self.commands[commandName].info['init']):
 						self.commands[commandName].init(self)
-					if ('aliases' in self.commands[commandName].info):	#TODO: eventually have a register command module function that also checks if info even exists.
+					if ('aliases' in self.commands[commandName].info):	#TODO: eventually have a register command module function that also checks if info even exists.  wrap init in a try/except
 						for alias in self.commands[commandName].info['aliases']:
 							assert alias.isalnum(), "Aliases should be alphanumerical."
 							alias = alias.lower()
@@ -335,7 +343,7 @@ class Feynbot(discord.Client):
 		if (not guild):
 			guild = self.get_guild(ID)
 		if (guild):
-			return self.setupServer(guild)
+			return self.setupGuild(guild)
 	def getUserData(self, user, forceOverride = False): 
 		ID = None 
 		if (type(user) == int):
@@ -347,7 +355,7 @@ class Feynbot(discord.Client):
 		if (not user):
 			user = self.get_user(user.id)
 		return self.setupUser(user)
-	def setupServer(self, guild):	#Should only be ran if we know the server data is missing.
+	def setupGuild(self, guild):	#Should only be ran if we know the server data is missing.
 		data = {
 			'_id': guild.id,
 			'prefix': None,	#Allows the default prefix to be changed without worried of most servers being unaffected.

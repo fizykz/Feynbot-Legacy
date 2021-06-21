@@ -92,7 +92,7 @@ class Interface:
 
 		if (self.guild): #check if we're in a guild.
 			data = self.getGuildData()
-			prefix = data['prefix']	#Get the guild prefix.
+			prefix = data['prefix'] or self.bot.settings.prefix	#Get the guild prefix.
 			substring = utils.substringIfStartsWith(string, prefix) 
 
 			if (substring): 
@@ -283,6 +283,8 @@ class Interface:
 		if (self.guild):
 			data = self.bot.getGuildData(self.guild.id)
 			self.guildData = data 
+			if data == None:
+				self.bot.setupGuild(self.guild)
 			return data 
 		return None 
 
