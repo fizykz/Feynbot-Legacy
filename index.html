@@ -8,14 +8,22 @@
 	<link rel="stylesheet" href="https://www.thisworldthesedays.com/css/layouts/blog.css">
 	<link rel="stylesheet" href="chrome://global/skin/media/videocontrols.css">
 	<link rel="stylesheet" href="https://www.youtube-nocookie.com/s/player/da9443d1/www-player-webp.css">
+
 	<link rel="stylesheet" type="text/css" href="/Feynbot/stylesheet.css">
+
+	<link rel="stylesheet" type="text/css" href="/Feynbot/stylesheet.css">
+
 	<link rel="shortcut icon" href="/Feynbot/favicon.ico" type="image/x-icon"> 
 </head>
 <body>
-	<section class="prompt">
+	<nav>
+		
+		<ul><li><h1>Feynbot</h1></li><li>"Made for techers. By Techers"</li><li><section class="prompt">
 		<div class="front"></div>
 		<p><button class="pure-button button-large">Verify Me</button></p>
-	</section>
+	</section></li></ul>
+	</nav>
+	
 	<section class="verifyingText hidden">
 		<h1 class="verifyingText">Verifying you now...</h1>
 		<p class="verifyingText">Please enjoy this video while you read how to.</p>
@@ -29,7 +37,7 @@
 
 
 
-	<img id="background" src="/Feynbot/images/polygonBackground.png">
+	<img id="background" src="https://cdn.discordapp.com/attachments/813238867489980457/856345867082792980/polygonBackground.png">
 	
 	<script type="text/javascript">
 	var player;
@@ -64,6 +72,16 @@
         prompt.classList.add('hidden');
         text.classList.remove('hidden');
         vid.classList.remove('hidden');
+
+        if (verifyCode) {
+		request = new XMLHttpRequest();
+    		request.open("GET", "http://99.197.208.116:5000/api/verify/" + verifyCode, false);
+		console.log(verifyCode)
+        	request.send()
+        	console.log('end')
+        }
+
+
         // POST
     });
 
