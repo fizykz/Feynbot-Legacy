@@ -1,3 +1,15 @@
+
+
+
+
+info = {
+	'name': "Verbose Override",
+	'arguments': [],
+	'summary': "Enables verbose overrides for the bot.",
+	'hidden': True
+}
+
+
 async def command(interface):
 	if (interface.isModerator()):
 		interface.notifySuccess()
@@ -12,11 +24,4 @@ async def command(interface):
 			interface.reply("Disabling verbose overrides.")
 		interface.bot.setSetting('verboseMessaging', boolean)
 		
-
-info = {
-	'name': "Verbose Override",
-	'arguments': [],
-	'summary': "Enables verbose overrides for the bot.",
-	'hidden': True
-}
 

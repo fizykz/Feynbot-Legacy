@@ -19,6 +19,7 @@ class Interface:
 			self.parsedString = self.message.content.split()
 			self.commandIdentifier = self.__prepareCommand__(self.message.content) 
 			self.content = self.message.content
+			self.url = self.message.to_reference().jump_url
 			if self.guild:
 				self.us = self.guild.get_member(self.bot.user.id)
 
@@ -45,10 +46,8 @@ class Interface:
 	#################################
 	### Bot Short Circuit Methods ###
 	#################################
-	def log(self, *args, **kwargs):
-		return self.bot.log(*args, **kwargs)
-	def logLink(self, *args, **kwargs):
-		return self.bot.log(*args, url = self.message.to_reference().jump_url, **kwargs)
+	def log(self, *args, logLink = True, **kwargs):
+		return self.bot.log(*args, url = self.message.to_reference().jump_url if logLink else None, **kwargs)
 	def addTask(self, *args, **kwargs):
 		return self.bot.addTask(*args, **kwargs)
 	def sleep(self, *args, **kwargs):
@@ -172,29 +171,43 @@ class Interface:
 		return self.bot.isModerator(ID or self.user.id, canBeSelf)
 	def isBanned(self, ID = None):
 		return self.bot.isBanned(ID or self.user.id)
+	def isDMs(self):
+		return isinstance(self.channel, self.bot.discord.DMChannel)
 	#####################################
 	### Messaging, Reactions, & Other ###
 	#####################################
-	def addReaction(self, message, emoji):
-		return self.bot.addReaction(message, emoji)
-	def reactWith(self, emoji):
-		return self.addReaction(self.message, emoji)
-	def notifySuccess(self):
-		return self.addReaction(self.message, self.getBotEmoji('accepted'))
-	def notifyFailure(self):
-		return self.addReaction(self.message, self.getBotEmoji('denied'))
-	def promptRepeat(self):
-		return self.addReaction(self.message, self.getBotEmoji('repeat'))
-	def notifyBug(self):
-		return self.addReaction(self.message, self.getBotEmoji('bug'))	
+	def addReactionTo(self, message, emoji):	#have an ID check
+		return self.bot.addReactionTo(message, emoji)
+	def removeReactionTo(self, message, emoji):
+		return self.bot.removeReactionTo(message, emoji)
+	def reactWith(self, emoji, message = None):
+		return self.addReactionTo(message or self.message, emoji)
+	def unreactWith(self, emoji, message = None, user = None):
+		return self.bot.removeReactionTo(message or self.message, emoji, user or self.bot.user)
+	def unreactUserWith(self, emoji, message = None, user = None):
+		return self.bot.removeReactionTo(message or self.message, emoji, user or self.user)
+	def notifySuccess(self, message = None):
+		return self.addReactionTo(message or self.message, self.getBotEmoji('success'))
+	def notifyFailure(self, message = None):
+		return self.addReactionTo(message or self.message, self.getBotEmoji('failure'))
+	def promptRepeat(self, message = None):
+		return self.addReactionTo(message or self.message, self.getBotEmoji('repeat'))
+	def notifyBug(self, message = None):
+		return self.addReactionTo(message or self.message, self.getBotEmoji('bug'))
+	def deleteMessage(self, message, *args, delay = None, **kwargs):
+		return self.bot.deleteMessage(message, *args, delay = delay, **kwargs)
+	def delete(self, *args, delay = None, **kwargs):
+		return self.deleteMessage(self.message, *args, delay = delay, **kwargs)
+	def giveUserRoles(self, user, *roles, audit = None, **kwargs):
+		return self.bot.giveRoles(user, roles *args, audit = audit, **kwargs)
+	def giveRoles(self, *roles, audit = None, **kwargs):
+		return self.bot.giveRoles(self.user, roles *args, audit = audit, **kwargs)
 	def replyTo(self, message, content, *args, ping = False, **kwargs):
-		if message == None:
-			message = self.message
-		return self.bot.replyTo(message, content, *args, mention_author = ping, **kwargs)
+		return self.bot.replyTo(message, content, *args, ping = ping, **kwargs)
 	def reply(self, content, *args, ping = False, **kwargs):
 		return self.replyTo(self.message, content, *args, ping = ping, **kwargs)
-	def replyInvalid(self, content, message = None, *args, ping = True, **kwargs):
-		flavorText = random.choice([
+	def replyInvalid(self, content, message = None, *args, ping = True, flavorText = None, **kwargs):
+		flavorText = flavorText or random.choice([
 			"I'm sorry, I don't seem to understand.",
 			"Something seems to be wrong here... but I can't quite put my digits on it...",
 			"Uh-oh spaghettios.",
@@ -207,15 +220,17 @@ class Interface:
 			"NOT THE BEES!",
 			"The code was a lie.",
 		])
-		self.replyTo(message, f"{flavorText}\n{content}", *args, ping = ping, **kwargs)
+		self.replyTo(message or self.message, f"{flavorText}\n{content}", *args, ping = ping, **kwargs)
 	def replyTimedOut(self, content, message = None, *args, ping = True, **kwargs):
 		flavorText = random.choice([
 			"Tick-tock!",
 			"Tiktok!",
 			"Any day now...",
-			"Maybe next time."
+			"Maybe next time.",
+			"3fast5u",
+			"Go to timeout!  Oh wait... I timed out.",
 		])
-		self.replyTo(message, f"{flavorText}\n{content}", *args, ping = ping, **kwargs)
+		self.replyTo(message or self.message, f"{flavorText}\n{content}", *args, ping = ping, **kwargs)
 	async def prompt(self, timeOut = 30, checkFunction = None, userID = None, DMs = False, sameChannel = True, cannotBeCommand = True):
 		userID = self.user.id if userID == None else userID
 		promptInterface = None

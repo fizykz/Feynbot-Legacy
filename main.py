@@ -63,35 +63,36 @@ class Feynbot(discord.Client):
 			'owners': data['owners'],
 			'admins': data['admins'],
 			'moderators': data['moderators'],
-			'alertsChannel': data['channels']['alerts'],
-			'infoChannel': data['channels']['info'],
 			'banned': {},
 			'credentials': AttributeDictionary(data['private']),
+			'links': AttributeDictionary(),
 		})
 		self.log("Starting bot...")
 
 		self.frequentEmojis = {
 			'repeat': '🔁',
-			'defaultAccepted': '✅',
-			'defaultDenied': '❌',
-			'accepted': 814316280299126794,
-			'denied': 814316281376931890,
+			'successDefault': '✅',
+			'failureDefault': '❌',
+			'success': 814316280299126794,
+			'failure': 814316281376931890,
 			'loading': 814316281393578026,
-			'downvote': 814316273021616128,
-			'upvote': 814316277291548683,
+			'downvote': 855650498487910410,
+			'upvote': 855650503283310632,
 			'feynbot': 814316650291658793,
-			'acceptedStatic': 815804106115383338,	
-			'deniedStatic': 815804106727489536,
-			'bug': 815936904779399188,
+			'successStatic': 855650490892288050,	
+			'failureStatic': 855650498035318804,
+			'bug': 855650094083080212,
+			'unableToSpeak': 855650088890269716,
+			'fizykz': 855650614200631326,
+			'feynbot': 855650527484706876,
 		}
 
 	#########################
 	### Startup & Logging ###
 	#########################
 	async def on_ready(self): #Bot ready to make API commands & to link events/commands.
-		self.isReady = True
-		self.state.alertsChannel = self.get_channel(self.state.alertsChannel)
-		self.state.infoChannel = self.get_channel(self.state.infoChannel)
+		self.state.links['alertsChannel'] = self.get_channel(data['channels']['alerts'])
+		self.state.links['infoChannel'] =  self.get_channel(data['channels']['info'])
 		self.log("Setting up environment and inititializing commands & command structure.", 1, True, True, title = 'Setting Up', color = 430090)
 		self.reloadCommands()
 		self.reloadEvents()
@@ -99,12 +100,15 @@ class Feynbot(discord.Client):
 		#TODO Add verification for Living Code 
 	def setVerbosity(self, verbosity):
 		return 
-	def log(self, message, verbosity = -1, vital = False, sendToDiagnostics = None, *args, **kwargs):
+	def log(self, message, verbosity = -1, vital = False, sendToDiagnostics = None, *args, prefix = None, **kwargs):
 		if verbosity <= self.settings['verbosity'] or vital:	#verbosity can be set to -1 if {noPrinting} is True.
-			prefix = "VITAL: " if vital else ""
+			prefix = prefix if prefix else "VITAL: " if vital else ""
 			print(prefix + str(message))
 			if self.isReady and (sendToDiagnostics or (sendToDiagnostics == None and (vital or self.settings.overrideDiagnostics))):
-				channel = self.state.alertsChannel if vital else self.state.infoChannel
+				channel = self.state.links['alertsChannel'] if vital else self.state.links['infoChannel']
+				if not channel:
+					self.state.links['alertsChannel'] = self.get_channel(data['channels']['alerts'])
+					self.state.links['infoChannel'] =  self.get_channel(data['channels']['info'])
 				color = (kwargs['color'] if 'color' in kwargs else (12779530 if vital else 213))
 				title = (kwargs['title'] if 'title' in kwargs else ('Alert' if vital else 'Post'))
 				return self.send(channel, None, embed = discord.Embed(
@@ -149,26 +153,41 @@ class Feynbot(discord.Client):
 	### Messaging & Other ###
 	#########################
 	def getBotEmoji(self, name):
-		return self.get_emoji(self.frequentEmojis[name]) or self.get_emoji(name)
+		if name in self.frequentEmojis:
+			try:
+				return self.get_emoji(int(self.frequentEmojis[name]))
+			except ValueError:
+				return self.frequentEmojis[name]
+		return self.get_emoji(name)
 	def stringifyUser(self, user, withID = True):
 		if (withID):
 			return f"{user.name}#{str(user.discriminator)} <UID:{str(user.id)}>"
 		return f"{user.name}#{str(user.discriminator)}"
-	def addReaction(self, message, emoji):
+	def addReactionTo(self, message, emoji):
 		return self.addTask(message.add_reaction(emoji))
-	def send(self, channel, content, *args, **kwargs):
-		return self.addTask(channel.send(content, *args, **kwargs))
-	def replyTo(self, message, content, *args, **kwargs):
-		return self.addTask(message.reply(content, *args, **kwargs))
-	def DMUser(self, user, content, *args, **kwargs):
+	def removeReactionTo(self, message, emoji, member):
+		return self.addTask(message.remove_reaction(emoji, member))
+	def send(self, channel, content, *args, ping = None, **kwargs):
+		return self.addTask(channel.send(content, *args, mention_author = ping, **kwargs))
+	def replyTo(self, message, content, *args, ping = None, **kwargs):
+		return self.addTask(message.reply(content, *args, mention_author = ping, **kwargs))
+	def DMUser(self, user, content, *args, ping = None, **kwargs):
 		if user.dm_channel:
-			return self.send(user.dm_channel, content, *args, **kwargs)
+			return self.send(user.dm_channel, content, *args, mention_author = ping, **kwargs)
 		else:
 			async def DMHelper():
 				await user.create_dm()
-				return self.send(user.dm_channel, content, *args, **kwargs)
+				return self.send(user.dm_channel, content, *args, mention_author = ping, **kwargs)
 			return self.addTask(DMHelper)
-	
+	def deleteMessage(self, message, *args, **kwargs):
+		return self.addTask(message.delete(*args, **kwargs))
+	def giveRoles(self, member, *roles, audit = None, **kwargs):
+		for i in range(len(roles)):
+			try:
+				roles[i] = member.guild.get_role(int(roles[i]))
+			except ValueError:
+				pass 
+		return self.addTask(member.add_roles(*roles, *args, reason = audit, **kwargs))
 	######################	
 	### Event Handling ###
 	######################

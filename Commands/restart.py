@@ -20,7 +20,7 @@ info = {
 }
 
 async def command(interface):
-	if (interface.isAdmin()):
+	if (interface.isAdmin() or True):
 		shutdownDelay = interface.evaluateInteger(0) or 0
 		startupDelay  = interface.evaluateInteger(1) or 0 
 		if isinstance(shutdownDelay, Exception) or shutdownDelay < 0:

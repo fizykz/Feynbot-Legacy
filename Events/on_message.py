@@ -17,3 +17,12 @@ async def event(bot, message):
 	if (commandInterface.isValidCommand()):
 		bot.log(f"Command `{repr(commandInterface.commandIdentifier)}` found.", 2, title = 'Command')
 		await commandInterface.runCommand()
+	elif (isinstance(message.channel, bot.discord.DMChannel)):
+		commandInterface.reply("This was a DM!")
+		#Get list of mutual servers.
+		#see which ones are listening to DM info
+		#check if there's a DM command specific to a server.
+			#does it have a conflict?
+			#if no pass & run.
+			#otherwise prompt the user to choose one.
+			
