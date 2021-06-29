@@ -160,7 +160,7 @@ class Interface:
 			if self.bot.settings['reloadOnError']:
 				self.log("Reloading libraries after an error.", -1, True, color = 12779530)
 				self.bot.reloadAll()
-			raise error 
+			raise error from None
 	def isOwner(self, ID = None, canBeSelf = False):
 		return self.bot.isOwner(ID or self.user.id, canBeSelf)
 	def isAdmin(self, ID = None, canBeSelf = False):
