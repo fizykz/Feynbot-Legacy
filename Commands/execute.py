@@ -18,27 +18,30 @@ info = {
 }
 
 async def command(interface):
-	run = 0
-	ourMessage = None
-	results = []
-
-	def customPrint(*args):	#define a custom print for our user executed code
-		print("EXECUTION:", *args)
-		args = [*args]
-		for index in range(len(args)):
-			args[index] = str(args[index])
-		results.append(('\t').join(args))	#collect what our bot printed when the customprint runs
-
-	def checkFunction(reaction, newUser): #our function to check if the user wanted to repeat later on
-		return str(reaction.emoji) == interface.bot.getFrequentEmoji('repeat') and interface.user == newUser and reaction.message == interface.message
-
 	if (interface.isOwner()):	#Make sure the messenger is the owner.
-		if not (not interface.bot.getSetting('safelock') and interface.bot.getSetting('livingCode')):	#Make sure we're allowing code to run.
-			interface.bot.safelock()	#If we aren't safelock the bot because WE should be knowing better.	#TODO: needs an alert to mark someone tried to run.
-			interface.notifyFailure()
-			interface.reply("Executing code has been disabled.")
-			return 
-		
+		run = 0
+		ourMessage = None
+		results = []
+
+		def asyncExec(code, Globals = None):
+			modifiedCode = ""
+			Locals = {}
+			for l in code.split('\n'):
+				modifiedCode = modifiedCode + f"\n\t{l}"
+			exec('async def executable():' + modifiedCode, Globals, Locals)
+			return Locals['executable']
+
+		def customPrint(*args):	#define a custom print for our user executed code
+			args = [*args]
+			for index in range(len(args)):
+				args[index] = str(args[index])
+			string = ('\t').join(args)	#collect what our bot printed when the custom print runs
+			results.append(string)
+			interface.log("EXECUTION: \t" + string, -1, True, title = ">Execute", color = 12779530)
+
+		def checkFunction(reaction, reactingUser): #our function to check if the user wanted to repeat later on
+			return str(reaction.emoji) == interface.getBotEmoji('repeat') and interface.user == reactingUser and reaction.message == interface.message
+
 		while True:	#Main code loop (for repeat running the code)
 			results = []
 			run = run + 1
@@ -50,22 +53,21 @@ async def command(interface):
 			while (re.search(r'^\s{2}  ', code, flags=re.M)):	#Loop when there's still spaces instead of tabs.
 				code = re.sub(r'^(\s*)[ ]{2}', r'\t\1', code, flags=re.M) #Replace two spaces (Discord default) with actual htab chars.
 
-			interface.alert(f"Attempting to run code by {interface.getFullUsername()}.", True) #Log the user running code (just in case, 'cause this shit is important)
+			interface.log(f"Attempting to run code by {interface.stringifyUser()}.", -1, True, True) #Log the user running code (just in case, 'cause this shit is important)
 			try: #Catch an error if the code fails.
-				program = compile(code, 'userInput', 'exec')	#compile to code object.
-				exec(program, {	#Execute the code, passing in some Discord objects.
+				await asyncExec(code, {	#Execute the code, passing in some Discord objects.
 					"bot": interface.bot,
 					"guild": interface.guild,
 					"channel": interface.channel,
 					"author": interface.user,
 					"message": interface.message,
-					"commands": interface.bot.commands,
+					"interface": interface,
 					"print": customPrint,
-					"commandInstance": interface
-				}, {})
+				})()
+
 			except Exception as error:	#If we threw an error.
 				interface.notifyFailure()
-				interface.alert("An error was raised when executing:  " + str(error), True)	#Print the error and reject it.
+				interface.log("An error was raised when executing:  " + repr(error), True)	#Print the error and reject it.
 				interface.reply("Run Attempt: " + str(run) + "\nAn error was raised when executing: \n````>>>\n" + str(error) + "\n```")	#Send a message of the error.
 			else:	#code ran fine
 				interface.notifySuccess()
@@ -74,14 +76,17 @@ async def command(interface):
 				else:
 					if asyncio.isfuture(ourMessage):
 						ourMessage = await ourMessage
-					interface.bot.editMessage(ourMessage, content = "Run Attempt: " + str(run) + "\n```>>>\n" + ('\n').join(results) + "\n```")
+					await ourMessage.edit(content = "Run Attempt: " + str(run) + "\n```>>>\n" + ('\n').join(results) + "\n```")
 
 			try:
 				interface.promptRepeat()	#Ask user if we want to repeat.
-				await interface.bot.wait_for('reaction_add', timeout=60.0, check=checkFunction)	#wait until user reacts or a timeout of a minute
-			except asyncio.TimeoutError as error:
-				interface.bot.removeReaction(interface.message, interface.bot.getFrequentEmoji('repeat'))	#remove the reaction if they didn't
+				await interface.bot.wait_for('reaction_add', timeout=60, check=checkFunction)	#wait until user reacts or a timeout of a minute
+			except asyncio.TimeoutError: 
+				interface.unreactWith(interface.bot.getBotEmoji('repeat'))	
 				return
 			else:
-				interface.bot.removeReaction(interface.message, interface.bot.getFrequentEmoji('repeat'), interface.user)	#remove their reaction (might error from no permission.)
+				interface.unreactUserWith(interface.bot.getBotEmoji('repeat'))	
+	else:
+		interface.log(f"{interface.stringifyUser()} tried running execute.")
+		interface.reply("Lol, imagine allowing anyone to run unsupervised code on my computer, nerd.")
 

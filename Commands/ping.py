@@ -21,6 +21,6 @@ async def command(interface):
 	ourMessage = await interface.reply(str(interface.bot.getBotEmoji('loading')) + " Ping!")
 	end = ourMessage.created_at
 	total = ("{:,}").format(int((end - start) / datetime.timedelta(microseconds=1) / 1000 / 2)) 	#Microsends in between, divided by 1000 to milli, then divided by two & formats with commas.
-	await ourMessage.edit(content = str(interface.bot.getBotEmoji('acceptedStatic')) + " Pong: " + total + " ms.")
-	interface.logLink(f"Average ping measured to be {total} ms.", title = 'Ping!')
+	await ourMessage.edit(content = str(interface.bot.getBotEmoji('successStatic')) + " Pong: " + total + " ms.")
+	interface.log(f"Average ping measured to be {total} ms.", title = 'Ping!')
 

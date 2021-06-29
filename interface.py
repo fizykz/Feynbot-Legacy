@@ -8,9 +8,10 @@ import utils
 
 
 class Interface:
-	def __init__(self, bot, object):
+	def __init__(self, bot, object, caller):
 		self.bot = bot 
 		self.utils = utils
+		self.caller = caller
 		if isinstance(object, discord.Message):
 			self.message = object 
 			self.user = self.message.author
@@ -19,19 +20,17 @@ class Interface:
 			self.parsedString = self.message.content.split()
 			self.commandIdentifier = self.__prepareCommand__(self.message.content) 
 			self.content = self.message.content
+			self.url = self.message.to_reference().jump_url
 			if self.guild:
 				self.us = self.guild.get_member(self.bot.user.id)
-
 			if (self.commandIdentifier):	#Check if this is a command as soon as we can to save memory/computation.
-				self.commandModule = bot.getCommand(self.commandIdentifier, [self.user.id, self.channel.id, self.guild and self.guild.id]) or None
+				self.commandModule = bot.getCommand(self.commandIdentifier, [self.user.id, self.channel.id, self.guild and self.guild.id], self.isDMs()) or None
 				if (self.commandModule): #Only keep going if it's a command with a valid module.
-					if (type(self.commandModule) != SyntaxError):	#Make sure this command module didn't error.
-						try:
-							self.command = self.commandModule.command
-						except Exception as error:
-							raise error
+					if not (isinstance(self.commandModule, BaseException)):	#Make sure this command module didn't error.
+						self.command = self.commandModule.command
 					else:
-						self.notifyError(self.commandModule)
+						self.notifyError()
+						raise self.commandModule from None 
 
 		elif isinstance(object, discord.TextChannel): 
 			self.channel = object
@@ -42,30 +41,28 @@ class Interface:
 			self.user = object 
 			self.guild = self.user.guild or None 
 
-	#################################
-	### Bot Short Circuit Methods ###
-	#################################
-	def log(self, *args, **kwargs):
-		return self.bot.log(*args, **kwargs)
-	def logLink(self, *args, **kwargs):
-		return self.bot.log(*args, url = self.message.to_reference().jump_url, **kwargs)
+	############################
+	### Bot Override Methods ###
+	############################
+	def getBotEmoji(self, *args, **kwargs):
+		return self.bot.getBotEmoji(*args, **kwargs)
 	def addTask(self, *args, **kwargs):
 		return self.bot.addTask(*args, **kwargs)
 	def sleep(self, *args, **kwargs):
 		return self.bot.sleep(*args, **kwargs)
+	def log(self, *args, logLink = True, **kwargs):
+		return self.bot.log(*args, url = self.message.to_reference().jump_url if logLink else None, **kwargs)
 	def stringifyUser(self, user = None, withID = True):
 		if not user:
 			user = self.user
 		return self.bot.stringifyUser(user, withID)
-	def getBotEmoji(self, name):
-		return self.bot.getBotEmoji(name)
 	########################
 	### Command Handling ###
 	########################
 	def __prepareCommand__(self, string):	#Returns command name.
 		string = string.lower()
 		data = None
-		prefix = self.bot.settings.prefix
+		prefix = self.bot.settings['prefix']
 
 		pattern = r'^ *([a-z]+)(?:\s|$)'
 
@@ -92,7 +89,7 @@ class Interface:
 
 		if (self.guild): #check if we're in a guild.
 			data = self.getGuildData()
-			prefix = data['prefix'] or self.bot.settings.prefix	#Get the guild prefix.
+			prefix = data['prefix'] or self.bot.settings['prefix']	#Get the guild prefix.
 			substring = utils.substringIfStartsWith(string, prefix) 
 
 			if (substring): 
@@ -159,11 +156,11 @@ class Interface:
 			else:
 				return self.command(self)
 		except Exception as error:
-			self.notifyBug()
+			self.notifyError()
 			if self.bot.settings['reloadOnError']:
 				self.log("Reloading libraries after an error.", -1, True, color = 12779530)
 				self.bot.reloadAll()
-			raise error 
+			raise error from None
 	def isOwner(self, ID = None, canBeSelf = False):
 		return self.bot.isOwner(ID or self.user.id, canBeSelf)
 	def isAdmin(self, ID = None, canBeSelf = False):
@@ -172,29 +169,44 @@ class Interface:
 		return self.bot.isModerator(ID or self.user.id, canBeSelf)
 	def isBanned(self, ID = None):
 		return self.bot.isBanned(ID or self.user.id)
+	def isDMs(self):
+		"""Returns True if this interface was constructed from a DM channel."""
+		return isinstance(self.channel, self.bot.discord.DMChannel)
 	#####################################
 	### Messaging, Reactions, & Other ###
 	#####################################
-	def addReaction(self, message, emoji):
-		return self.bot.addReaction(message, emoji)
-	def reactWith(self, emoji):
-		return self.addReaction(self.message, emoji)
-	def notifySuccess(self):
-		return self.addReaction(self.message, self.getBotEmoji('accepted'))
-	def notifyFailure(self):
-		return self.addReaction(self.message, self.getBotEmoji('denied'))
-	def promptRepeat(self):
-		return self.addReaction(self.message, self.getBotEmoji('repeat'))
-	def notifyBug(self):
-		return self.addReaction(self.message, self.getBotEmoji('bug'))	
+	def addReactionTo(self, message, emoji):	#have an ID check
+		return self.bot.addReactionTo(message, emoji)
+	def removeReactionTo(self, message, emoji):
+		return self.bot.removeReactionTo(message, emoji)
+	def reactWith(self, emoji, message = None):
+		return self.addReactionTo(message or self.message, emoji)
+	def unreactWith(self, emoji, message = None, user = None):
+		return self.bot.removeReactionTo(message or self.message, emoji, user or self.bot.user)
+	def unreactUserWith(self, emoji, message = None, user = None):
+		return self.bot.removeReactionTo(message or self.message, emoji, user or self.user)
+	def notifySuccess(self, message = None):
+		return self.addReactionTo(message or self.message, self.getBotEmoji('success'))
+	def notifyFailure(self, message = None):
+		return self.addReactionTo(message or self.message, self.getBotEmoji('failure'))
+	def promptRepeat(self, message = None):
+		return self.addReactionTo(message or self.message, self.getBotEmoji('repeat'))
+	def notifyError(self, message = None):
+		return self.addReactionTo(message or self.message, self.getBotEmoji('bug'))
+	def deleteMessage(self, message, *args, delay = None, **kwargs):
+		return self.bot.deleteMessage(message, *args, delay = delay, **kwargs)
+	def delete(self, *args, delay = None, **kwargs):
+		return self.deleteMessage(self.message, *args, delay = delay, **kwargs)
+	def giveUserRoles(self, user, *roles, audit = None, **kwargs):
+		return self.bot.giveRoles(user, roles *args, audit = audit, **kwargs)
+	def giveRoles(self, *roles, audit = None, user = None, **kwargs):
+		return self.bot.giveRoles(user or self.user, *roles, audit = audit, **kwargs)
 	def replyTo(self, message, content, *args, ping = False, **kwargs):
-		if message == None:
-			message = self.message
-		return self.bot.replyTo(message, content, *args, mention_author = ping, **kwargs)
+		return self.bot.replyTo(message, content, *args, ping = ping, **kwargs)
 	def reply(self, content, *args, ping = False, **kwargs):
 		return self.replyTo(self.message, content, *args, ping = ping, **kwargs)
-	def replyInvalid(self, content, message = None, *args, ping = True, **kwargs):
-		flavorText = random.choice([
+	def replyInvalid(self, content, message = None, *args, ping = True, flavorText = None, **kwargs):
+		flavorText = flavorText or random.choice([
 			"I'm sorry, I don't seem to understand.",
 			"Something seems to be wrong here... but I can't quite put my digits on it...",
 			"Uh-oh spaghettios.",
@@ -207,15 +219,17 @@ class Interface:
 			"NOT THE BEES!",
 			"The code was a lie.",
 		])
-		self.replyTo(message, f"{flavorText}\n{content}", *args, ping = ping, **kwargs)
+		self.replyTo(message or self.message, f"{flavorText}\n{content}", *args, ping = ping, **kwargs)
 	def replyTimedOut(self, content, message = None, *args, ping = True, **kwargs):
 		flavorText = random.choice([
 			"Tick-tock!",
 			"Tiktok!",
 			"Any day now...",
-			"Maybe next time."
+			"Maybe next time.",
+			"3fast5u",
+			"Go to timeout!  Oh wait... I timed out.",
 		])
-		self.replyTo(message, f"{flavorText}\n{content}", *args, ping = ping, **kwargs)
+		self.replyTo(message or self.message, f"{flavorText}\n{content}", *args, ping = ping, **kwargs)
 	async def prompt(self, timeOut = 30, checkFunction = None, userID = None, DMs = False, sameChannel = True, cannotBeCommand = True):
 		userID = self.user.id if userID == None else userID
 		promptInterface = None
@@ -225,22 +239,22 @@ class Interface:
 				return False 
 			if userID == message.author.id:	
 				if sameChannel and message.channel == self.channel:
-					promptInterface = Interface(self.bot, message)
+					promptInterface = Interface(self.bot, message, self)
 				elif DMs and hasattr(message.channel, 'recipient'):
-					promptInterface = Interface(self.bot, message)
+					promptInterface = Interface(self.bot, message, self)
 				elif not sameChannel:
-					promptInterface = Interface(self.bot, message)
+					promptInterface = Interface(self.bot, message, self)
 			else:
 				try:
 					iter(userID)
 					for ID in userID:
 						if message.author.id == ID:
 							if sameChannel and message.channel == self.channel:
-								promptInterface = Interface(self.bot, message)
+								promptInterface = Interface(self.bot, message, self)
 							elif DMs and hasattr(message.channel, 'recipient') and message.channel.recipient.id == ID:
-								promptInterface = Interface(self.bot, message)
+								promptInterface = Interface(self.bot, message, self)
 							elif not sameChannel:
-								promptInterface = Interface(self.bot, message)
+								promptInterface = Interface(self.bot, message, self)
 				except TypeError:
 					pass
 			if promptInterface and not (cannotBeCommand and promptInterface.isValidCommand()):
