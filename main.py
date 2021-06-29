@@ -523,16 +523,29 @@ class Feynbot(discord.Client):
 						if (fileName.endswith('.py') and fileName[0:-3].isalnum()):
 							commandName = fileName[0:-3]
 							self.registerCommand(commandName = commandName, modulePath = f'CommandOverrides.{folderName}.{commandName}', override = ID, startup = startup)
-	def getCommand(self, commandIdentifier, IDs):
+	def getCommand(self, commandIdentifier, IDs, DMs):
 		"""Grabs the highest priority command given the user, channel, and guild ID. 
 		Also may choose commands for DMs.
 		"""
+
 		for ID in IDs:
 			ID = str(ID)
 			if ID in self.commandOverrides and commandIdentifier in self.commandOverrides[ID]:
-				return self.commandOverrides[ID][commandIdentifier]
+				module = self.commandOverrides[ID][commandIdentifier]
+				info = module.info if hasattr(module, 'info') else {}
+				direct = info['direct'] if 'direct' in info else True
+				directOnly = info['directOnly'] if 'directOnly' in info else False 
+				if ((DMs and (directOnly or direct)) or (not DMs and not directOnly)):
+					return module
+
 		if (commandIdentifier in self.commands):
-			return self.commands[commandIdentifier]
+			module = self.commands[commandIdentifier]
+			info = module.info if hasattr(module, 'info') else {}
+			direct = info['direct'] if 'direct' in info else True
+			directOnly = info['directOnly'] if 'directOnly' in info else False 
+			if ((DMs and (directOnly or direct)) or (not DMs and not directOnly)):
+				return module
+			
 		return None 
 	def reloadAll(self, *, overrides = True, startup = False):
 		"""Reloads all events and all commands, including overrides if {overrides} and dictates if it should run startup functions if {startup}."""
