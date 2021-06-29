@@ -152,7 +152,7 @@ class Feynbot(discord.Client):
 	###############
 	### Fetches ###
 	###############
-	async def getChannels(self, *IDs, guilds = None, fetch_guilds = False):
+	async def getChannels(self, *IDs, guilds = None, fetch_guilds = False, suppress = False):
 		"""Returns a list of channels given IDs/or if they're channels already, asserts them.
 		A list entry will be False if Forbidden, None if an HTTPException occured, or raise an error if it wasn't a proper channel ID.
 		"""
@@ -162,19 +162,12 @@ class Feynbot(discord.Client):
 		if len(IDs) == 0 and not guilds:
 			raise error("getChannel() was called with no IDs and no guilds.")
 		for ID in IDs:
-			if isinstance(ID, discord.abc.GuildChannel) or isinstance(ID, discord.abc.PrivateChannel):
-				continue 
-			else:
-				try:
-					ID = int(ID)
-				except ValueError:
-					raise ValueError("A channel ID was passed that wasn't an integer nor was already a channel.") from None
 			channel = self.get_channel(ID)
-			if channels:
+			if channel:
 				channels.append(channel)
 			else:
 				try:
-					channel = self.addTask(self.fetch_channel(ID))
+					channel = self.addTask(self.fetch_channel(ID))	#TODO supress errors if suppress
 					#Will still potentially raise NotFound & InvalidData errors.
 				except discord.HTTPException as error:
 					channels.append(None)
