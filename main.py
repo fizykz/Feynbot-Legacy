@@ -332,7 +332,7 @@ class Feynbot(discord.Client):
 			events = self.eventOverrides[override]
 		try:
 			module = importlib.import_module(modulePath)
-			importlib.reload(module)	#Reload the module just in case we've ran before.
+			module = importlib.reload(module)	#Reload the module just in case we've ran before.
 		except SyntaxError as error:
 			events[eventName] = error 
 			self.log(f"{error.filename}:{error.lineno}:{error.offset}:\n{error.text}", verbosity = -1, critical = True)
@@ -446,7 +446,8 @@ class Feynbot(discord.Client):
 			commands = self.commandOverrides[override]
 		try:
 			module = importlib.import_module(modulePath)
-			importlib.reload(module)	#Reload the module just in case we've ran before.
+			module = importlib.reload(module)	#Reload the module just in case we've ran before.
+			self.log(f"{module.__file__} reloaded.", verbosity = 2)
 		except SyntaxError as error:
 			commands[commandName] = error 
 			self.log(f"{error.filename}:{error.lineno}:{error.offset}:\n{error.text}", verbosity = -1, critical = True)
