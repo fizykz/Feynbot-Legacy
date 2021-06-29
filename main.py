@@ -8,18 +8,18 @@ data = fileToJson('./config.json')
 data['private'] = fileToJson('./private.json')
 data['packageInfo'] = fileToJson('./packageInfo.json')
 
-#Todo:  All of these as full features:  
-parser = argparse.ArgumentParser(description = "A Python Discord bot with a powerful and modular architecture.")
+CLIArguments = None 
+parser = argparse.ArgumentParser(description = "A Python Discord bot with a powerful and modular architecture.")		#CLI Argument parsing
 parser.add_argument('--verbose', '-v', dest = 'verbosity', action = 'count', default = 0, help = "Prints more content when running the program, -vvv is more verbose than -v.")
 parser.add_argument('--version', '-ver', action = 'version', version = data['packageInfo']['VERSION'], help = "Prints more content when running the program, -vvv is more verbose than -v.")
 parser.add_argument('--overrideDiagnostics', '-d', dest = 'overrideDiagnostics', action = 'store_true', default = False, help = "Sends all logged messages to diagnostics.") 
-parser.add_argument('--noPrinting', '-np', dest = 'noPrinting', action='store_true', help="Removes trivial bot logging; still prints errors & key events.")
 
+parser.add_argument('--discordWarnings', '-w', dest = 'discordWarnings', action = 'store_true', help = "Starts logging warnings from Discord's logging feature.")
 parser.add_argument('--reloadOnError', '-R', dest = 'reloadOnError', action = 'store_true', help = "Reloads commands, events, & more on most errors.")
 parser.add_argument('--resetSafelock', '-s', dest = 'resetSafeLock', action = 'store_true', help = "Resets a safelock if it was in place.")
 parser.add_argument('--livingCode', '-l', dest = 'livingCode', action = 'store_true', help = "Alllows the livingCode to be enabled.  Still needs to be unlocked before the safelock duration to be used the full session.")
 parser.add_argument('--livingCodeSession', dest = 'livingCodeSession', action = 'store_true', help = "Turns off the unlock duration, so the bot won't automatically safelock.  Only use if you know what you're doing.")
-CLIArguments = parser.parse_args()
+CLIArguments = parser.parse_args() 
 
 import numpy
 import asyncio
@@ -33,6 +33,9 @@ import inspect
 import math
 import datetime
 import random
+if CLIArguments.discordWarnings:
+	import logging
+	logging.basicConfig(level = logging.WARNING)
 
 import pymongo
 import discord
