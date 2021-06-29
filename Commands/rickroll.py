@@ -56,6 +56,7 @@ MMMWXKKXXXNXc.    .....;::::c:::,.........."""
 gif = "https://cdn.discordapp.com/attachments/809437719880663070/858539168895729704/HDRickroll.gif"
 
 info = {
+	'name': "Rickroll",
 	'arguments': [],
 	'summary': "Provides help for general use of the bot or a specific command.",
 	'aliases': ['rr'],
