@@ -613,7 +613,7 @@ class Feynbot(discord.Client):
 	def setupGuild(self, guild):	#Should only be ran if we know the server data is missing.
 		data = {
 			'_id': guild.id,
-			'prefix': None,	#Allows the default prefix to be changed without worried of most servers being unaffected.
+			'prefix': None,
 			'roleData': {},
 			'stats': {},
 			'disabledCommands': [],
@@ -631,6 +631,9 @@ class Feynbot(discord.Client):
 			'_id': user.id,
 			'banned': False,
 			'stats': {},
+			'lastDM': 0,
+			'lastMessage': 0,
+			'lastCommand': 0,
 		}
 		return #Boop
 
