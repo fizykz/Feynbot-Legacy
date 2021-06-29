@@ -198,8 +198,8 @@ class Interface:
 		return self.deleteMessage(self.message, *args, delay = delay, **kwargs)
 	def giveUserRoles(self, user, *roles, audit = None, **kwargs):
 		return self.bot.giveRoles(user, roles *args, audit = audit, **kwargs)
-	def giveRoles(self, *roles, audit = None, **kwargs):
-		return self.bot.giveRoles(self.user, roles *args, audit = audit, **kwargs)
+	def giveRoles(self, *roles, audit = None, user = None, **kwargs):
+		return self.bot.giveRoles(user or self.user, *roles, audit = audit, **kwargs)
 	def replyTo(self, message, content, *args, ping = False, **kwargs):
 		return self.bot.replyTo(message, content, *args, ping = ping, **kwargs)
 	def reply(self, content, *args, ping = False, **kwargs):
