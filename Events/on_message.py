@@ -28,6 +28,6 @@ async def event(self, message):
 				#otherwise prompt the user to choose one.
 	except Exception as error:
 		if self.settings['reloadOnError']:
-			self.log("Reloading libraries after an error.", -1, True, color = 12779530)
+			self.log("Reloading libraries after an error.", verbosity = -1, critical = True, color = 12779530)
 			self.reloadAll()
 		raise error from None			
