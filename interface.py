@@ -62,7 +62,7 @@ class Interface:
 	def __prepareCommand__(self, string):	#Returns command name.
 		string = string.lower()
 		data = None
-		prefix = self.bot.settings.prefix
+		prefix = self.bot.settings['prefix']
 
 		pattern = r'^ *([a-z]+)(?:\s|$)'
 
@@ -89,7 +89,7 @@ class Interface:
 
 		if (self.guild): #check if we're in a guild.
 			data = self.getGuildData()
-			prefix = data['prefix'] or self.bot.settings.prefix	#Get the guild prefix.
+			prefix = data['prefix'] or self.bot.settings['prefix']	#Get the guild prefix.
 			substring = utils.substringIfStartsWith(string, prefix) 
 
 			if (substring): 

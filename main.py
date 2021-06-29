@@ -2,7 +2,6 @@
 #Lead program stuff.  argparse, etc. .
 import argparse
 from utils import fileToJson
-from attrdict import AttrDict as AttributeDictionary
 
 data = fileToJson('./config.json')
 data['private'] = fileToJson('./private.json')
@@ -55,21 +54,22 @@ class Feynbot(discord.Client):
 		self.commandOverrides = {}
 		self.events = {}
 		self.eventOverrides = {}
-		self.settings = AttributeDictionary({
+
+		#Collection of settings/configs that influence how the bot runs.
+		self.settings = {
 			'overrideDiagnostics': CLIArguments.overrideDiagnostics,
 			'reloadOnError': CLIArguments.reloadOnError,
-			'verbosity': CLIArguments.verbosity if not CLIArguments.noPrinting else -1, 
+			'verbosity': CLIArguments.verbosity,
 			'safelock': False,
 			'prefix': data['other']['prefix']
-		})
-		self.state = AttributeDictionary({
+		}
+
+		#Collection of data
+		self.state = {
 			'owners': data['owners'],
 			'admins': data['admins'],
 			'moderators': data['moderators'],
 			'banned': {},
-			'credentials': AttributeDictionary(data['private']),
-			'links': AttributeDictionary(),
-		})
 		self.log("Starting bot...")
 
 		self.frequentEmojis = {
@@ -88,6 +88,8 @@ class Feynbot(discord.Client):
 			'unableToSpeak': 855650088890269716,
 			'fizykz': 855650614200631326,
 			'feynbot': 855650527484706876,
+			'credentials': data['private'],
+			'links': {},
 		}
 
 	#########################
