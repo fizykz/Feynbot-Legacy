@@ -170,6 +170,7 @@ class Interface:
 	def isBanned(self, ID = None):
 		return self.bot.isBanned(ID or self.user.id)
 	def isDMs(self):
+		"""Returns True if this interface was constructed from a DM channel."""
 		return isinstance(self.channel, self.bot.discord.DMChannel)
 	#####################################
 	### Messaging, Reactions, & Other ###
