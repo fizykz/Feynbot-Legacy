@@ -1,5 +1,4 @@
-
-#Lead program stuff.  argparse, etc. .
+#Argparsing first in case we end up terminating early.
 import argparse
 from utils import fileToJson
 
