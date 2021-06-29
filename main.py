@@ -404,23 +404,28 @@ class Feynbot(discord.Client):
 			It begins by getting a list of IDs from the process function in the default event module in /events.
 			After this, it will call getEvent() and find the highest overriding event and call that module's event function with all it's arguments.
 			"""
-			IDs = [] 		
+			IDs = [] 
 			if (eventName in self.events and hasattr(self.events[eventName], 'process')):		# If our event module has a process method we need to figure out how to sort overrides.
 				process = self.events[eventName].process										# Get our process function.
 				assert process.__code__.co_argcount - len(args) - 1 == 0, f"The {eventName} event process() function has {process.__code__.co_argcount} arguments, {eventName} event gives {len(args)} however.  Check Discord.py API reference."
 				IDs = process(self, *args)
-			try:
-				event = self.getEvent(eventName, IDs)							# Our event module.
-				assert event.event.__code__.co_argcount - len(args) - 1 == 0, f"The {event.__file__} event function has {event.event.__code__.co_argcount} arguments, {eventName} event gives {len(args)} however.  Check Discord.py API reference."
-				if (inspect.iscoroutinefunction(event.event)):					# Is this a coroutine or a function?
-					return self.addTask(event.event(self, *args))				# Run a coroutine
-				else:
-					return event.event(self, *args)								# Run a function
-			except Exception as error:	# Catch any error to reload the library, we'll raise it again after.
-				if self.settings['reloadOnError']:
-					self.log("Reloading libraries after an error.", verbosity = -1, critical = True, color = 12779530)
-					self.reloadAll()
-				raise error from None 
+				event = self.getEvent(eventName, IDs)											# Our event module.
+				try:
+					assert event.event.__code__.co_argcount - len(args) - 1 == 0, f"The {event.__file__} event function has {event.event.__code__.co_argcount} arguments, {eventName} event gives {len(args)} however.  Check Discord.py API reference."
+					if (inspect.iscoroutinefunction(event.event)):					# Is this a coroutine or a function?
+						return self.addTask(event.event(self, *args))				# Run a coroutine
+					else:
+						return event.event(self, *args)								# Run a function
+				except Exception as error:	# Catch any error to reload the library, we'll raise it again after.
+					if self.settings['reloadOnError']:
+						self.log("Reloading libraries after an error.", verbosity = -1, critical = True, color = 12779530)
+						self.reloadAll()
+					raise error from None 
+			elif (eventName in self.events):
+				self.log(f"Event {eventName} doesn't have a process function and wasn't able to be checked for overrides!  Consider adding it!", verbosity = -1, critical = -1, title = "No Process Function")
+			else:
+				self.log(f"Event {eventName} was removed from the events dictionary when the event was fired!  Consider unlistening ot the event or ensuring it remains.", verbosity = -1, critical = -1, title = "No Event")
+				raise RuntimeError(f"Event {eventName} was removed from the events dictionary when the event was fired!  Consider unlistening ot the event or ensuring it remains.")
 		handler.__name__ = eventName 	# Rename the handler to the event name (Discord.py needs the name of the function to match.)
 		self.event(handler)				# Use Discord library to hook the event and start listening.
 	def getEvent(self, event, IDs):
