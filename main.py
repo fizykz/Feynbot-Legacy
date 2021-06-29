@@ -177,14 +177,15 @@ class Feynbot(discord.Client):
 					self.ForbiddenError(error)
 		#Await all our channels.
 		for channel in channels:
-			await channel
+			if self.isFuture(channel):
+				await channel
 		if guilds:
 			for guild in guilds:
 				if fetch_guilds:
 					channels.extend(await guild.fetch_channels())
 				else:
 					channels.extend(guild.channels)
-		return channels
+		return tuple(channels)
 	####################################
 	### Startup, Logging, & Settings ###
 	####################################
