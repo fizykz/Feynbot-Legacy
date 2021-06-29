@@ -587,19 +587,13 @@ class Feynbot(discord.Client):
 	################
 	### Database ###
 	################
-	def getGuildData(self, guild, forceOverride = False):
-		ID = None 
-		if (type(guild) == int):
-			ID = guild 
-			guild = None 
-		data = dbUtils.getObjectByID(ID, forceOverride)
+	def getGuildData(self, guildID, forceOverride = False):
+		data = dbUtils.getObjectByID(guildID, forceOverride)
 		if (data):
 			return data
-		if (not guild):
-			guild = self.get_guild(ID)
-		if (guild):
-			return self.setupGuild(guild)
-	def getUserData(self, user, forceOverride = False): 
+		else:
+			return self.setupGuild(self.get_guild(guildID))
+	def getUserData(self, userID, forceOverride = False): 
 		ID = None 
 		if (type(user) == int):
 			ID = user 
