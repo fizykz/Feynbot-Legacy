@@ -372,7 +372,7 @@ class Feynbot(discord.Client):
 		This is called through handleEvent()'s handler() function.
 		"""
 		#Remove previous events.
-		for eventName, module in self.events.items():
+		for eventName in tuple(self.events.keys()):
 			del self.events[eventName]
 
 		#Iterate over & register.
@@ -383,7 +383,7 @@ class Feynbot(discord.Client):
 
 		if (overrides):
 			#Remove previous events.
-			for ID in self.eventOverrides.keys():
+			for ID in tuple(self.eventOverrides.keys()):
 				del eventOverrides[ID]
 
 			for folderName in os.listdir('./EventOverrides'):
