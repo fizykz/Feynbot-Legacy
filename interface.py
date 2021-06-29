@@ -23,17 +23,14 @@ class Interface:
 			self.url = self.message.to_reference().jump_url
 			if self.guild:
 				self.us = self.guild.get_member(self.bot.user.id)
-
 			if (self.commandIdentifier):	#Check if this is a command as soon as we can to save memory/computation.
 				self.commandModule = bot.getCommand(self.commandIdentifier, [self.user.id, self.channel.id, self.guild and self.guild.id]) or None
 				if (self.commandModule): #Only keep going if it's a command with a valid module.
-					if (type(self.commandModule) != SyntaxError):	#Make sure this command module didn't error.
-						try:
-							self.command = self.commandModule.command
-						except Exception as error:
-							raise error
+					if not (isinstance(self.commandModule, BaseException)):	#Make sure this command module didn't error.
+						self.command = self.commandModule.command
 					else:
-						self.notifyError(self.commandModule)
+						self.notifyError()
+						raise self.commandModule from None 
 
 		elif isinstance(object, discord.TextChannel): 
 			self.channel = object
