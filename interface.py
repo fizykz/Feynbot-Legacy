@@ -44,21 +44,21 @@ class Interface:
 			self.user = object 
 			self.guild = self.user.guild or None 
 
-	#################################
-	### Bot Short Circuit Methods ###
-	#################################
-	def log(self, *args, logLink = True, **kwargs):
-		return self.bot.log(*args, url = self.message.to_reference().jump_url if logLink else None, **kwargs)
+	############################
+	### Bot Override Methods ###
+	############################
+	def getBotEmoji(self, *args, **kwargs):
+		return self.bot.getBotEmoji(*args, **kwargs)
 	def addTask(self, *args, **kwargs):
 		return self.bot.addTask(*args, **kwargs)
 	def sleep(self, *args, **kwargs):
 		return self.bot.sleep(*args, **kwargs)
+	def log(self, *args, logLink = True, **kwargs):
+		return self.bot.log(*args, url = self.message.to_reference().jump_url if logLink else None, **kwargs)
 	def stringifyUser(self, user = None, withID = True):
 		if not user:
 			user = self.user
 		return self.bot.stringifyUser(user, withID)
-	def getBotEmoji(self, name):
-		return self.bot.getBotEmoji(name)
 	########################
 	### Command Handling ###
 	########################
