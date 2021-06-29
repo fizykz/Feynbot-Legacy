@@ -158,7 +158,7 @@ class Interface:
 		except Exception as error:
 			self.notifyError()
 			if self.bot.settings['reloadOnError']:
-				self.log("Reloading libraries after an error.", -1, True, color = 12779530)
+				self.log("Reloading libraries after an error.", verbosity = -1, critical = True, color = 12779530)
 				self.bot.reloadAll()
 			raise error from None
 	def isOwner(self, ID = None, canBeSelf = False):
