@@ -1,6 +1,6 @@
 info = {
-	'name': "Version",
-	'arguments': [],
+	'name': "Example",
+	'arguments': [("FirstArgument", "The description of our first argument!"), ("SecondArgument", "The description of our second argument!")],
 	'aliases': [],
 	'summary': "Just a random command!",
 	'hidden': True,
