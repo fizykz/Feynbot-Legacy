@@ -140,7 +140,7 @@ class Interface:
 			try: 
 				return int(self.parsedArguments[position])
 			except ValueError as error:
-				return error
+				return None 
 		return None
 	def evaluateNumber(self, position):
 		if (position < self.getArgumentLength()):
