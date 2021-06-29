@@ -147,7 +147,17 @@ class Interface:
 			try: 
 				return num(self.parsedArguments[position])
 			except ValueError as error:
-				return error
+				return None
+		return None
+	def evaluateMention(self, position):
+		"""Returns the userID of a mention if one was found in the position."""
+		#<@!395419912845393923>
+		if (position < self.getArgumentLength()):
+			pattern = r'<@!?(\d*)>'
+			string = self.getArgument(position)
+			match = re.match(pattern, string)
+			if match:
+				return int(match.group(1))
 		return None
 	async def runCommand(self):
 		try:
