@@ -1,5 +1,4 @@
-
-#Lead program stuff.  argparse, etc. .
+#Argparsing first in case we end up terminating early.
 import argparse
 from utils import fileToJson
 
@@ -153,7 +152,7 @@ class Feynbot(discord.Client):
 	###############
 	### Fetches ###
 	###############
-	async def getChannels(self, *IDs, guilds = None, fetch_guilds = False):
+	async def getChannels(self, *IDs, guilds = None, fetch_guilds = False, suppress = False):
 		"""Returns a list of channels given IDs/or if they're channels already, asserts them.
 		A list entry will be False if Forbidden, None if an HTTPException occured, or raise an error if it wasn't a proper channel ID.
 		"""
@@ -163,19 +162,12 @@ class Feynbot(discord.Client):
 		if len(IDs) == 0 and not guilds:
 			raise error("getChannel() was called with no IDs and no guilds.")
 		for ID in IDs:
-			if isinstance(ID, discord.abc.GuildChannel) or isinstance(ID, discord.abc.PrivateChannel):
-				continue 
-			else:
-				try:
-					ID = int(ID)
-				except ValueError:
-					raise ValueError("A channel ID was passed that wasn't an integer nor was already a channel.") from None
 			channel = self.get_channel(ID)
-			if channels:
+			if channel:
 				channels.append(channel)
 			else:
 				try:
-					channel = self.addTask(self.fetch_channel(ID))
+					channel = self.addTask(self.fetch_channel(ID))	#TODO supress errors if suppress
 					#Will still potentially raise NotFound & InvalidData errors.
 				except discord.HTTPException as error:
 					channels.append(None)
@@ -185,14 +177,15 @@ class Feynbot(discord.Client):
 					self.ForbiddenError(error)
 		#Await all our channels.
 		for channel in channels:
-			await channel
+			if self.isFuture(channel):
+				await channel
 		if guilds:
 			for guild in guilds:
 				if fetch_guilds:
 					channels.extend(await guild.fetch_channels())
 				else:
 					channels.extend(guild.channels)
-		return channels
+		return tuple(channels)
 	####################################
 	### Startup, Logging, & Settings ###
 	####################################
@@ -339,7 +332,7 @@ class Feynbot(discord.Client):
 			events = self.eventOverrides[override]
 		try:
 			module = importlib.import_module(modulePath)
-			importlib.reload(module)	#Reload the module just in case we've ran before.
+			module = importlib.reload(module)	#Reload the module just in case we've ran before.
 		except SyntaxError as error:
 			events[eventName] = error 
 			self.log(f"{error.filename}:{error.lineno}:{error.offset}:\n{error.text}", verbosity = -1, critical = True)
@@ -453,7 +446,8 @@ class Feynbot(discord.Client):
 			commands = self.commandOverrides[override]
 		try:
 			module = importlib.import_module(modulePath)
-			importlib.reload(module)	#Reload the module just in case we've ran before.
+			module = importlib.reload(module)	#Reload the module just in case we've ran before.
+			self.log(f"{module.__file__} reloaded.", verbosity = 2)
 		except SyntaxError as error:
 			commands[commandName] = error 
 			self.log(f"{error.filename}:{error.lineno}:{error.offset}:\n{error.text}", verbosity = -1, critical = True)
@@ -593,19 +587,13 @@ class Feynbot(discord.Client):
 	################
 	### Database ###
 	################
-	def getGuildData(self, guild, forceOverride = False):
-		ID = None 
-		if (type(guild) == int):
-			ID = guild 
-			guild = None 
-		data = dbUtils.getObjectByID(ID, forceOverride)
+	def getGuildData(self, guildID, forceOverride = False):
+		data = dbUtils.getObjectByID(guildID, forceOverride)
 		if (data):
 			return data
-		if (not guild):
-			guild = self.get_guild(ID)
-		if (guild):
-			return self.setupGuild(guild)
-	def getUserData(self, user, forceOverride = False): 
+		else:
+			return self.setupGuild(self.get_guild(guildID))
+	def getUserData(self, userID, forceOverride = False): 
 		ID = None 
 		if (type(user) == int):
 			ID = user 
@@ -619,7 +607,7 @@ class Feynbot(discord.Client):
 	def setupGuild(self, guild):	#Should only be ran if we know the server data is missing.
 		data = {
 			'_id': guild.id,
-			'prefix': None,	#Allows the default prefix to be changed without worried of most servers being unaffected.
+			'prefix': None,
 			'roleData': {},
 			'stats': {},
 			'disabledCommands': [],
@@ -637,6 +625,9 @@ class Feynbot(discord.Client):
 			'_id': user.id,
 			'banned': False,
 			'stats': {},
+			'lastDM': 0,
+			'lastMessage': 0,
+			'lastCommand': 0,
 		}
 		return #Boop
 

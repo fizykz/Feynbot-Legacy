@@ -140,14 +140,24 @@ class Interface:
 			try: 
 				return int(self.parsedArguments[position])
 			except ValueError as error:
-				return error
+				return None 
 		return None
 	def evaluateNumber(self, position):
 		if (position < self.getArgumentLength()):
 			try: 
 				return num(self.parsedArguments[position])
 			except ValueError as error:
-				return error
+				return None
+		return None
+	def evaluateMention(self, position):
+		"""Returns the userID of a mention if one was found in the position."""
+		#<@!395419912845393923>
+		if (position < self.getArgumentLength()):
+			pattern = r'<@!?(\d*)>'
+			string = self.getArgument(position)
+			match = re.match(pattern, string)
+			if match:
+				return int(match.group(1))
 		return None
 	async def runCommand(self):
 		try:
@@ -158,7 +168,7 @@ class Interface:
 		except Exception as error:
 			self.notifyError()
 			if self.bot.settings['reloadOnError']:
-				self.log("Reloading libraries after an error.", -1, True, color = 12779530)
+				self.log("Reloading libraries after an error.", verbosity = -1, critical = True, color = 12779530)
 				self.bot.reloadAll()
 			raise error from None
 	def isOwner(self, ID = None, canBeSelf = False):
