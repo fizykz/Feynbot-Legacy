@@ -156,7 +156,7 @@ class Interface:
 			else:
 				return self.command(self)
 		except Exception as error:
-			self.notifyBug()
+			self.notifyError()
 			if self.bot.settings['reloadOnError']:
 				self.log("Reloading libraries after an error.", -1, True, color = 12779530)
 				self.bot.reloadAll()
@@ -190,7 +190,7 @@ class Interface:
 		return self.addReactionTo(message or self.message, self.getBotEmoji('failure'))
 	def promptRepeat(self, message = None):
 		return self.addReactionTo(message or self.message, self.getBotEmoji('repeat'))
-	def notifyBug(self, message = None):
+	def notifyError(self, message = None):
 		return self.addReactionTo(message or self.message, self.getBotEmoji('bug'))
 	def deleteMessage(self, message, *args, delay = None, **kwargs):
 		return self.bot.deleteMessage(message, *args, delay = delay, **kwargs)
