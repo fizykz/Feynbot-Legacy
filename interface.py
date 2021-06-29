@@ -238,22 +238,22 @@ class Interface:
 				return False 
 			if userID == message.author.id:	
 				if sameChannel and message.channel == self.channel:
-					promptInterface = Interface(self.bot, message)
+					promptInterface = Interface(self.bot, message, self)
 				elif DMs and hasattr(message.channel, 'recipient'):
-					promptInterface = Interface(self.bot, message)
+					promptInterface = Interface(self.bot, message, self)
 				elif not sameChannel:
-					promptInterface = Interface(self.bot, message)
+					promptInterface = Interface(self.bot, message, self)
 			else:
 				try:
 					iter(userID)
 					for ID in userID:
 						if message.author.id == ID:
 							if sameChannel and message.channel == self.channel:
-								promptInterface = Interface(self.bot, message)
+								promptInterface = Interface(self.bot, message, self)
 							elif DMs and hasattr(message.channel, 'recipient') and message.channel.recipient.id == ID:
-								promptInterface = Interface(self.bot, message)
+								promptInterface = Interface(self.bot, message, self)
 							elif not sameChannel:
-								promptInterface = Interface(self.bot, message)
+								promptInterface = Interface(self.bot, message, self)
 				except TypeError:
 					pass
 			if promptInterface and not (cannotBeCommand and promptInterface.isValidCommand()):
