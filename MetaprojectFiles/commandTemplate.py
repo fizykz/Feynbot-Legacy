@@ -11,7 +11,8 @@ info = {									#Dictionary of values.
 	'summary': "Just a random command!",	#Summary of the command itself.  Or a description.
 	'hidden': True, 						#Hidden to the help command and users.
 	'DMs': False,							#Allows the command to be used in DMs.
-	'DMsOnly': False						#Only allows the command to be used in DMs.
+	'DMsOnly': False,						#Only allows the command to be used in DMs.
+	'register': True,						#This can be left unset, but if set to False, this command will not be registered publicly.
 }
 
 state = {}									#Collection of state for this command.
