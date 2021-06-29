@@ -8,9 +8,10 @@ import utils
 
 
 class Interface:
-	def __init__(self, bot, object):
+	def __init__(self, bot, object, caller):
 		self.bot = bot 
 		self.utils = utils
+		self.caller = caller
 		if isinstance(object, discord.Message):
 			self.message = object 
 			self.user = self.message.author
