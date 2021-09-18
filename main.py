@@ -58,8 +58,8 @@ class Feynbot(discord.Client):
 		'downvote': 855650498487910410,
 		'upvote': 855650503283310632,
 		'feynbot': 814316650291658793,
-		'successStatic': 855650490892288050,
-		'failureStatic': 855650498035318804,
+		'success': 855650490892288050,
+		'failure': 855650498035318804,
 		'bug': '🐛',
 		'error': 855650094083080212,
 		'unableToSend': 855650088890269716,
@@ -78,7 +78,7 @@ class Feynbot(discord.Client):
 
 		self.isReady = False
 
-		#Command collection
+		#Command collection*
 		self.commands = {}
 		self.commandOverrides = {}
 
