@@ -1,4 +1,4 @@
-#Argparsing first in case we end up terminating early.
+# We don't need to import all libraries unless we know we're running the bot.
 import argparse
 from utils import fileToJson
 
@@ -6,18 +6,16 @@ data = fileToJson('./config.json')
 data['private'] = fileToJson('./private.json')
 data['packageInfo'] = fileToJson('./packageInfo.json')
 
-CLIArguments = None 
-parser = argparse.ArgumentParser(description = "A Python Discord bot with a powerful and modular architecture.")		#CLI Argument parsing
+CLIArguments = None
+parser = argparse.ArgumentParser(description = "A Python Discord bot with a powerful and modular architecture.")
 parser.add_argument('--verbose', '-v', dest = 'verbosity', action = 'count', default = 0, help = "Prints more content when running the program, -vvv is more verbose than -v.")
-parser.add_argument('--version', '-ver', action = 'version', version = data['packageInfo']['VERSION'], help = "Prints more content when running the program, -vvv is more verbose than -v.")
-parser.add_argument('--overrideDiagnostics', '-d', dest = 'overrideDiagnostics', action = 'store_true', default = False, help = "Sends all logged messages to diagnostics.") 
-
+parser.add_argument('--version', '-V', action = 'version', version = data['packageInfo']['VERSION'], help = "Prints the current version of the bot.")
+parser.add_argument('--overrideDiagnostics', '-d', dest = 'overrideDiagnostics', action = 'store_true', default = False, help = "Sends all logged messages to diagnostics.")
 parser.add_argument('--discordWarnings', '-w', dest = 'discordWarnings', action = 'store_true', help = "Starts logging warnings from Discord's logging feature.")
 parser.add_argument('--reloadOnError', '-R', dest = 'reloadOnError', action = 'store_true', help = "Reloads commands, events, & more on most errors.")
-parser.add_argument('--resetSafelock', '-s', dest = 'resetSafeLock', action = 'store_true', help = "Resets a safelock if it was in place.")
 parser.add_argument('--livingCode', '-l', dest = 'livingCode', action = 'store_true', help = "Alllows the livingCode to be enabled.  Still needs to be unlocked before the safelock duration to be used the full session.")
-parser.add_argument('--livingCodeSession', dest = 'livingCodeSession', action = 'store_true', help = "Turns off the unlock duration, so the bot won't automatically safelock.  Only use if you know what you're doing.")
-CLIArguments = parser.parse_args() 
+
+CLIArguments = parser.parse_args()
 
 import numpy
 import asyncio
@@ -38,7 +36,7 @@ if CLIArguments.discordWarnings:
 import pymongo
 import discord
 
-#Self made libraries.  NOTE: These are only the staticly imported libraries.  
+#Self made libraries.  NOTE: These are only the staticly imported libraries.
 #Under './Commands', './Overrides', and more, are dynamically imported libraries which aren't listed here.
 #See architecture documentation #TODO
 import utils
@@ -52,23 +50,23 @@ class Feynbot(discord.Client):
 	interface = interface.Interface
 	discord = discord
 
-	#Frequent Emojis #TODO: update all old IDs to new dev server.
 	frequentEmojis = {
 		'repeat': '🔁',
 		'successDefault': '✅',
 		'failureDefault': '❌',
-		'success': 814316280299126794,
-		'failure': 814316281376931890,
-		'loading': 814316281393578026,
+		'loading': 855650522292027402,
 		'downvote': 855650498487910410,
 		'upvote': 855650503283310632,
 		'feynbot': 814316650291658793,
-		'successStatic': 855650490892288050,	
+		'successStatic': 855650490892288050,
 		'failureStatic': 855650498035318804,
-		'bug': 855650094083080212,
-		'unableToSpeak': 855650088890269716,
+		'bug': '🐛',
+		'error': 855650094083080212,
+		'unableToSend': 855650088890269716,
 		'fizykz': 855650614200631326,
-		'feynbot': 855650527484706876,}
+		'feynbot': 855650527484706876,
+	}
+
 	def __init__(self, *args, **kwargs):
 		"""Initializes a bot instance.  This represents the bot's state & interface.
 		Passing arguments passes them directly to the superclass, discord.Client.
@@ -77,8 +75,9 @@ class Feynbot(discord.Client):
 		#Superclass
 		super().__init__(*args, **kwargs)
 
+
 		self.isReady = False
-		
+
 		#Command collection
 		self.commands = {}
 		self.commandOverrides = {}
@@ -132,7 +131,7 @@ class Feynbot(discord.Client):
 				return await function(*args, **kwargs)
 			else:
 				return function(*args, **kwargs)
-			
+
 		return self.addTask(helper())
 	def runFunction(self, function, *args, **kwargs):
 		"""Runs a coroutine or a function, regardless of type."""
@@ -145,7 +144,7 @@ class Feynbot(discord.Client):
 	######################
 	def HTTPError(self, error):	#TODO Notify repetitive HTTPExceptions.
 		"""Handles an HTTP Exception, currently incomplete."""
-		self.log("HTTPError: ", error, repr = True)	
+		self.log("HTTPError: ", error, repr = True)
 	def ForbiddenError(self, error):
 		"""Handles an HTTP Exception, currently incomplete."""
 		self.log("HTTPError: ", error, repr = True)
@@ -189,22 +188,22 @@ class Feynbot(discord.Client):
 	####################################
 	### Startup, Logging, & Settings ###
 	####################################
-	async def on_ready(self): 
+	async def on_ready(self):
 		"""The function first ran when the bot opens up.
 		API calls are able to be made at this point, which the bot first uses to find and get it's logging channels.
 		These logging channels represent Discord channels which have information pushed to them when asked to through Feynbot.log()
 
-		What's most important about this function however is it's when it initializes bot commands & events.  
+		What's most important about this function however is it's when it initializes bot commands & events.
 		Commands are initialized first then events (so all commands are available on the events being listened to)
 		More info on these in the respective sections.
 		"""
 		#Link our channels.
-		self.state['links']['alertsChannel'] = await self.fetch_channel(data['channels']['alerts'])	
+		self.state['links']['alertsChannel'] = await self.fetch_channel(data['channels']['alerts'])
 		self.state['links']['infoChannel'] =  await self.fetch_channel(data['channels']['info'])
 		self.log("Setting up environment and inititializing commands & command structure.", verbosity = 1, critical = True, title = 'Setting Up', color = 430090)
 		self.reloadAll(startup = True)	#reload all with the intention of startup.
 		self.log(f"Bot ready & started.", verbosity = -1, critical = True, title = 'Ready', color = 430090)
-		#TODO Add verification for Living Code 
+		#TODO Add verification for Living Code
 	def setVerbosity(self, verbosity):
 		"""Sets the bot's verbosity to an interger from 0 to 4.
 		Higher numbers represent higher verbosity and more messages being sent to logging.
@@ -216,7 +215,7 @@ class Feynbot(discord.Client):
 				self.settings['verbosity'] = verbosity
 			else:
 				raise ValueError(f"Verbosity should be an integer 0 to 4 but got {repr(verbosity)} instead.")
-		except ValueError: 
+		except ValueError:
 			raise ValueError(f"Verbosity should be an integer 0 to 4 but got {repr(verbosity)} instead.") from None
 	def log(self, *args, verbosity = -1, critical = False, sendToDiagnostics = None, useRepr = False, prefix = None, title = None, url = None, color = None):
 		"""Logs a message to the bot console & possibly logging channels.
@@ -226,10 +225,10 @@ class Feynbot(discord.Client):
 		Green = 430090, Orange = 16744202, Yellow = 12835850, Red = 12779530, Blue = 213
 		"""
 		#Return if it doesn't meet verbosity requirements and it's not critical.
-		if verbosity >= self.settings['verbosity'] and not critical:	
-			return 
+		if verbosity >= self.settings['verbosity'] and not critical:
+			return
 
-		message = "" 
+		message = ""
 		for msg in args:	#Go through our arguments and convert everything to a string using {str} or {repr}
 			if useRepr:
 				message = message + f'{repr(msg)}\t'
@@ -238,7 +237,7 @@ class Feynbot(discord.Client):
 		prefix = prefix if prefix else "Σ: " if critical else "λ: "
 		print(prefix + message)
 
-		#Check if we need to send to the diangostic channels.	
+		#Check if we need to send to the diangostic channels.
 		if self.isReady and (sendToDiagnostics or (sendToDiagnostics == None and (critical or self.settings['overrideDiagnostics']))):
 			#If it's critical, send to the alerts channel, otherwise info.
 			channel = self.state['links']['alertsChannel'] if critical else self.state['links']['infoChannel']
@@ -252,22 +251,22 @@ class Feynbot(discord.Client):
 				color = color,
 				))
 	async def restart(self, shutdownDelay = 0, startupDelay = 0, cancellable = True):
-		"""Shutsdown the bot in {shutdownDelay} seconds. 
+		"""Shutsdown the bot in {shutdownDelay} seconds.
 		Then restarts the bot in {startupDelay}.
 		{cancellable} dictates if it be cancelled by command.
 		"""
 		self.log(f"Closing the bot in {shutdownDelay} second(s) followed by a {startupDelay} second pause until restart.", -1, True, True, title = 'Restart')
 		try:
-			await self.sleep(shutdownDelay, False)	
+			await self.sleep(shutdownDelay, False)
 			asyncio.run_coroutine_threadsafe(self.close(), self.loop) #https://github.com/Rapptz/discord.py/issues/5786
 			self.isReady = False
 		except Exception as error:
 			print("VITAL ERROR: While shutting down: " + str(error))
-		finally: 
+		finally:
 			await self.sleep(startupDelay, False)
 			subprocess.call([sys.executable] + sys.argv)	#reruns the script as its last remaining task with the same arguments.
 	async def end(self, shutdownDelay = 0, cancellable = True):
-		"""Shutsdown the bot in {shutdownDelay} seconds. 
+		"""Shutsdown the bot in {shutdownDelay} seconds.
 		{cancellable} dictates if it be cancelled by command.
 		"""
 		self.log(f"Closing the bot in {shutdownDelay} second(s) & remaining closed until further commands.", -1, True, True, title = 'Shutdown', color = 12779530)
@@ -316,9 +315,9 @@ class Feynbot(discord.Client):
 			try:
 				roles.append(member.guild.get_role(int(ID)))
 			except ValueError:
-				pass 
+				pass
 		return self.addTask(member.add_roles(*roles, reason = audit, **kwargs))
-	################################	
+	################################
 	### Command & Event Handling ###
 	################################
 	def registerEvent(self, *, eventName, modulePath, override, startup):
@@ -326,7 +325,7 @@ class Feynbot(discord.Client):
 		This will manually import and reload the module, handling syntax errors.
 		Finally it'll also run an init() and startup() function, if present in the right context.
 		"""
-		module = None 
+		module = None
 		events = self.events
 		if (override):
 			events = self.eventOverrides[override]
@@ -334,7 +333,7 @@ class Feynbot(discord.Client):
 			module = importlib.import_module(modulePath)
 			module = importlib.reload(module)	#Reload the module just in case we've ran before.
 		except SyntaxError as error:
-			events[eventName] = error 
+			events[eventName] = error
 			self.log(f"{error.filename}:{error.lineno}:{error.offset}:\n{error.text}", verbosity = -1, critical = True)
 			return False
 		events[eventName] = module
@@ -353,10 +352,10 @@ class Feynbot(discord.Client):
 			else:
 				self.log(f"{modulePath}.py errored on init(): {str(error)}", verbosity = -1, critical = True)
 			del events[eventName] #Remove the command after a setup error.
-			return False 
+			return False
 		if not override:
 			self.handleEvent(eventName)
-		return True 
+		return True
 	def reloadEvents(self, *, overrides=True, startup = False):
 		"""Reloads all commands.
 		This will iterate over ./Events and ./OverrideEvents
@@ -397,7 +396,7 @@ class Feynbot(discord.Client):
 			It begins by getting a list of IDs from the process function in the default event module in /events.
 			After this, it will call getEvent() and find the highest overriding event and call that module's event function with all it's arguments.
 			"""
-			IDs = [] 
+			IDs = []
 			if (eventName in self.events and hasattr(self.events[eventName], 'process')):		# If our event module has a process method we need to figure out how to sort overrides.
 				process = self.events[eventName].process										# Get our process function.
 				assert process.__code__.co_argcount - len(args) - 1 == 0, f"The {eventName} event process() function has {process.__code__.co_argcount} arguments, {eventName} event gives {len(args)} however.  Check Discord.py API reference."
@@ -413,7 +412,7 @@ class Feynbot(discord.Client):
 					if self.settings['reloadOnError']:
 						self.log("Reloading libraries after an error.", verbosity = -1, critical = True, color = 12779530)
 						self.reloadAll()
-					raise error from None 
+					raise error from None
 			elif (eventName in self.events):
 				self.log(f"Event {eventName} doesn't have a process function and wasn't able to be checked for overrides!  Consider adding it!", verbosity = -1, critical = -1, title = "No Process Function")
 			else:
@@ -440,7 +439,7 @@ class Feynbot(discord.Client):
 		It will process aliases & also give some tips/warnings if anythings out of sorts.
 		Finally it'll also run an init() and startup() function, if present in the right context.
 		"""
-		module = None 
+		module = None
 		commands = self.commands
 		if (override):
 			commands = self.commandOverrides[override]
@@ -449,13 +448,13 @@ class Feynbot(discord.Client):
 			module = importlib.reload(module)	#Reload the module just in case we've ran before.
 			self.log(f"{module.__file__} reloaded.", verbosity = 2)
 		except SyntaxError as error:
-			commands[commandName] = error 
+			commands[commandName] = error
 			self.log(f"{error.filename}:{error.lineno}:{error.offset}:\n{error.text}", verbosity = -1, critical = True)
 			return False
 		if commandName in commands:
 			otherModule = commands[commandName]
 			self.log(f"{otherModule.__file__} has an alias of {commandName} but a package by this name already exists!\n{module.__file__} will now replace this alias.", verbosity = -1, critical = True)
-		if not (hasattr(module, 'info') and 'name' in module.info): 
+		if not (hasattr(module, 'info') and 'name' in module.info):
 			self.log(f"{module.__file__} is missing a dictionary entry module.info['name'].  Consider adding it.", verbosity = -1, critical = True)
 		else:
 			#Make sure this file is marked to be registered or not marked at all.
@@ -479,7 +478,7 @@ class Feynbot(discord.Client):
 			del commands[commandName] #Remove the command after a setup error.
 
 		# Check & add aliases.
-		if ('aliases' in commands[commandName].info):	
+		if ('aliases' in commands[commandName].info):
 			for alias in commands[commandName].info['aliases']:
 				assert alias.isalnum(), "Aliases should be alphanumerical."
 				alias = alias.lower()
@@ -487,7 +486,7 @@ class Feynbot(discord.Client):
 					commands[alias] = commands[commandName]
 				else:
 					self.log(f"{commandName}.py tried to impliment alias \"{alias}\" but it was already taken by {commands[alias].__name__}.py", verbosity = -1, critical = True)
-		return True 
+		return True
 	def reloadCommands(self, *, overrides=True, startup = False):
 		"""Iterates over ./Commands and ./CommandOverrides
 		Finds all .py command files, and attempts to register them to the bot.
@@ -495,10 +494,10 @@ class Feynbot(discord.Client):
 		"""
 		#First we'll handle global commands.
 		#Go over current direct message commands, delete them from the registry.
-		for commandName in tuple(self.commands.keys()):	
+		for commandName in tuple(self.commands.keys()):
 			del self.commands[commandName]
 		#Iterate over command files.
-		for fileName in os.listdir('./Commands'):	
+		for fileName in os.listdir('./Commands'):
 			if (fileName.endswith('.py') and fileName[0:-3].isalnum()): # Valid command should be an alphanumerical name followed by .py
 				commandName = fileName[0:-3]
 				self.registerCommand(commandName = commandName, modulePath = f'Commands.{commandName}', override = False, startup = startup)
@@ -507,18 +506,18 @@ class Feynbot(discord.Client):
 			for ID in tuple(self.commandOverrides.keys()):
 				del self.commandOverrides[ID]
 			#Iterate over override folders.
-			for folderName in os.listdir('./CommandOverrides'):					
+			for folderName in os.listdir('./CommandOverrides'):
 				if (re.match(r'\d+', folderName) and not re.match(r'\.', folderName)):
 					ID = re.match(r'\d+', folderName).group(0)
 					#Iterate over override commands.
-					for fileName in os.listdir('./CommandOverrides/' + folderName + '/'):	
+					for fileName in os.listdir('./CommandOverrides/' + folderName + '/'):
 						if (not ID in self.commandOverrides):
 							self.commandOverrides[ID] = {}
 						if (fileName.endswith('.py') and fileName[0:-3].isalnum()):
 							commandName = fileName[0:-3]
 							self.registerCommand(commandName = commandName, modulePath = f'CommandOverrides.{folderName}.{commandName}', override = ID, startup = startup)
 	def getCommand(self, commandIdentifier, IDs, DMs):
-		"""Grabs the highest priority command given the user, channel, and guild ID. 
+		"""Grabs the highest priority command given the user, channel, and guild ID.
 		Also may choose commands for DMs.
 		"""
 
@@ -528,7 +527,7 @@ class Feynbot(discord.Client):
 				module = self.commandOverrides[ID][commandIdentifier]
 				info = module.info if hasattr(module, 'info') else {}
 				direct = info['direct'] if 'direct' in info else True
-				directOnly = info['directOnly'] if 'directOnly' in info else False 
+				directOnly = info['directOnly'] if 'directOnly' in info else False
 				if ((DMs and (directOnly or direct)) or (not DMs and not directOnly)):
 					return module
 
@@ -536,11 +535,11 @@ class Feynbot(discord.Client):
 			module = self.commands[commandIdentifier]
 			info = module.info if hasattr(module, 'info') else {}
 			direct = info['direct'] if 'direct' in info else True
-			directOnly = info['directOnly'] if 'directOnly' in info else False 
+			directOnly = info['directOnly'] if 'directOnly' in info else False
 			if ((DMs and (directOnly or direct)) or (not DMs and not directOnly)):
 				return module
-			
-		return None 
+
+		return None
 	def reloadAll(self, *, overrides = True, startup = False):
 		"""Reloads all events and all commands, including overrides if {overrides} and dictates if it should run startup functions if {startup}."""
 		self.reloadEvents(overrides = overrides, startup = startup)
@@ -593,11 +592,11 @@ class Feynbot(discord.Client):
 			return data
 		else:
 			return self.setupGuild(self.get_guild(guildID))
-	def getUserData(self, userID, forceOverride = False): 
-		ID = None 
+	def getUserData(self, userID, forceOverride = False):
+		ID = None
 		if (type(user) == int):
-			ID = user 
-			user = None 
+			ID = user
+			user = None
 		data = dbUtils.getObjectByID(user.id, forceOverride)
 		if (data):
 			return data
@@ -619,7 +618,7 @@ class Feynbot(discord.Client):
 			},
 		}
 		dbUtils.setObject(data)
-		return data 
+		return data
 	def setupUser(self, user):
 		data = {
 			'_id': user.id,
